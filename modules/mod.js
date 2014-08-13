@@ -1,7 +1,7 @@
 define(['minivents'], function (Events) {
 	function InfernoShoutMod() {
 		this.commands = {};
-		this.events = new Events();
+		this.events = new Events(this);
 	}
 
 	InfernoShoutMod.prototype.init = function () {
@@ -49,7 +49,7 @@ define(['minivents'], function (Events) {
 				this.shoutframe.scrollTop = this.shoutframe.scrollHeight;
 			}
 
-			self.events.emit('update_shouts', shouts);
+			self.emit('update_shouts', shouts);
 		};
 
 		// BETTER pming.
@@ -82,7 +82,7 @@ define(['minivents'], function (Events) {
 
 			var evt = new MessageEvent(message);
 
-			self.events.emit('shout', evt);
+			self.emit('shout', evt);
 
 			message = evt.message;
 

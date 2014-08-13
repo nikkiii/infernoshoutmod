@@ -1,6 +1,6 @@
 define(['../modules/util'], function(Util) {
 	var YoutubePlugin = function(mod) {
-		mod.events.on('shout', function(ctx, evt) {
+		mod.on('shout', function(ctx, evt) {
 			var message = evt.message;
 			if (message.indexOf('youtube.com') != -1 || message.indexOf('youtu.be') != -1) {
 				var url = /(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*))/.exec(message);

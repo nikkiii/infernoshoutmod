@@ -1,0 +1,3 @@
+define(['./mod'], function(InfernoShoutMod) {
+
+});
