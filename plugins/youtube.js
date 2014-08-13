@@ -40,12 +40,15 @@ define(['../modules/util'], function(Util) {
 									var minutes = Math.floor(length / 60);
 									var seconds = length % 60;
 
-									InfernoShoutbox.postShout(message + " - " + Util.filterTitle(title) + " - [" + minutes + ":" + (seconds < 10 ? ('0' + seconds) : seconds) + "]");
+									InfernoShoutbox.postShout(InfernoShoutbox.shout_params.prefix + message + " - " + Util.filterTitle(title) + " - [" + minutes + ":" + (seconds < 10 ? ('0' + seconds) : seconds) + "]" + InfernoShoutbox.shout_params.suffix);
 								} else {
-									InfernoShoutbox.postShout(message);
+									InfernoShoutbox.postShout(InfernoShoutbox.shout_params.prefix + message + InfernoShoutbox.shout_params.suffix);
 								}
 							}
 						});
+
+						// Clear the text field
+						InfernoShoutbox.clear();
 
 						// Break the chain and make sure we don't handle the original method.
 						ctx.breakHandlerChain();
