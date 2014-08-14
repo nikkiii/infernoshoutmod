@@ -38,10 +38,6 @@ define(['minivents'], function (Events) {
 			this.editshout.ajax.send('infernoshout.php', 'do=doeditshout&shoutid=' + shoutid + '&shout=(deleted message)&delete=1&');
 		};
 
-		InfernoShoutbox.idlecheck = function () {
-
-		};
-
 		InfernoShoutbox.update_shouts = function (shouts) {
 			this.shoutframe.innerHTML = shouts;
 
