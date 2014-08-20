@@ -70,6 +70,12 @@ define(['minivents'], function (Events) {
 				return false;
 			}
 
+			if (this.idle) {
+				this.hide_notice();
+			}
+			this.idle = false;
+			this.idletime = 0;
+
 			message = this.editor.value;
 			if (PHP.trim(message) == '') {
 				this.show_notice('Please enter a message first.');
