@@ -19,7 +19,8 @@ var plugins = [
 	'plugins/groupchanger',
 	'plugins/quoting',
 	'plugins/youtube',
-	'plugins/noshadow'
+	'plugins/noshadow',
+	'plugins/userhistory'
 ];
 
 require(deps, function($, InfernoShoutMod) {
