@@ -4,7 +4,9 @@ require.config({
 	baseUrl : 'http://nikkii.us/sbmod/',
 	paths: {
 		jquery : 'http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min',
-		minivents : 'lib/minivents'
+		minivents : 'lib/minivents',
+		htmlparser : 'lib/htmlparser',
+		soupselect : 'lib/soupselect'
 	}
 });
 

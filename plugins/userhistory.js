@@ -1,6 +1,6 @@
 // Username History Plugin
 // Based off code by Major and Klepto
-define(function() {
+define(['htmlparser', 'soupselect'], function(HtmlParser, SoupSelect) {
 	var UsernameHistoryPlugin = function(mod) {
 		var FontWeight = {
 			NORMAL: {},
@@ -67,26 +67,37 @@ define(function() {
 				tab.text("Loading...");
 				tab.width(55);
 
-				$.get("http://www.rune-server.org/member.php?u=" + id, function(data) {
+				$.get("/member.php?u=" + id, function(data) {
 					var usernames = "", width = NAME_LIST_PREFIX_WIDTH;
 
-					$(".historyblock tr", $(data)).slice(1).each(function () {
-						var username =  $(this).children("td:first").text(), usernameWidth = username.width();
-						if (usernameWidth >= width) {
-							width = usernameWidth;
+					var handler = new HtmlParser.HtmlBuilder(function(err, dom) {
+						if (err) {
+							console.log(err);
+						} else {
+							var rows = SoupSelect.select(dom, '.historyblock tr');
+
+							rows.slice(1).forEach(function(row) {
+								var username =  row.children[1].children[0].data, usernameWidth = username.width();
+								if (usernameWidth >= width) {
+									width = usernameWidth;
+								}
+								usernames += "<li>" + username + "</li>";
+							});
+
+							width = (usernames != "" ? NO_PREVIOUS_NAMES_WIDTH : width) + 5;
+							tab.width(width);
+
+							usernames = !usernames ? "<li>No previous names.</li>" : NAME_LIST_PREFIX + usernames;
+							cachedUsernames[id] = new User(width, usernames);
+
+							if (loading == id) {
+								tab.html(usernames);
+							}
 						}
-						usernames += "<li>" + username + "</li>";
 					});
 
-					width = (usernames != "" ? NO_PREVIOUS_NAMES_WIDTH : width) + 5;
-					tab.width(width);
-
-					usernames = !usernames ? "No previous names." : NAME_LIST_PREFIX + usernames;
-					cachedUsernames[id] = new User(width, usernames);
-
-					if (loading == id) {
-						tab.html(usernames);
-					}
+					var parser = new HtmlParser.Parser(handler);
+					parser.parseComplete(data);
 				});
 			}
 		};
