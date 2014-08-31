@@ -1,11 +1,13 @@
 define(function() {
 	var NoShadowPlugin = function(mod) {
 		mod.on('update_shouts', function(shouts) {
-			$('span', InfernoShoutbox.shoutframe).each(function (index) {
-				if ($(this).css('text-shadow')) {
-					$(this).css('text-shadow', '');
-				}
-			});
+			if (!InfernoShoutbox.effects) {
+				$('span', InfernoShoutbox.shoutframe).each(function (index) {
+					if ($(this).css('text-shadow')) {
+						$(this).css('text-shadow', '');
+					}
+				});
+			}
 		});
 	};
 

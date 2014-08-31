@@ -51,7 +51,7 @@ define(['htmlparser', 'soupselect'], function(HtmlParser, SoupSelect) {
 		}
 
 
-		var cachedUsernames = new Array();
+		var cachedUsernames = [], loadingUsernames = [];
 		var loading = -1;
 
 		var setUsernameTooltip = function(id, link) {
@@ -62,10 +62,12 @@ define(['htmlparser', 'soupselect'], function(HtmlParser, SoupSelect) {
 				var user = cachedUsernames[id];
 				tab.width(user.width);
 				tab.html(user.html);
-			} else {
+			} else if (loadingUsernames.indexOf(id) == -1) {
 				loading = id;
 				tab.text("Loading...");
 				tab.width(55);
+
+				loadingUsernames.push(id);
 
 				$.get("/member.php?u=" + id, function(data) {
 					var usernames = "", width = NAME_LIST_PREFIX_WIDTH;
@@ -92,6 +94,13 @@ define(['htmlparser', 'soupselect'], function(HtmlParser, SoupSelect) {
 
 							if (loading == id) {
 								tab.html(usernames);
+							}
+
+							for (var i = 0; i < loadingUsernames.length; i++) {
+								if (loadingUsernames[i] == id) {
+									delete loadingUsernames[i];
+									break;
+								}
 							}
 						}
 					});

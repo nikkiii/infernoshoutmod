@@ -1,7 +1,7 @@
 window.InfernoShoutMod = {};
 
 require.config({
-	baseUrl : 'http://nikkii.us/sbmod/',
+	baseUrl : 'http://nikkii.us/sbmod/dev/',
 	paths: {
 		jquery : 'http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min',
 		minivents : 'lib/minivents',
@@ -9,6 +9,14 @@ require.config({
 		soupselect : 'lib/soupselect'
 	}
 });
+
+function loadCss(url) {
+	var link = document.createElement("link");
+	link.type = "text/css";
+	link.rel = "stylesheet";
+	link.href = url;
+	document.getElementsByTagName("head")[0].appendChild(link);
+}
 
 var deps = [
 	'jquery',
@@ -18,6 +26,7 @@ var deps = [
 ];
 
 var plugins = [
+	'plugins/settings',
 	'plugins/groupchanger',
 	'plugins/quoting',
 	'plugins/youtube',
@@ -30,6 +39,8 @@ require(deps, function($, InfernoShoutMod) {
 	mod.init();
 
 	console.log('[InfernoShoutMod] Initial loading done.');
+
+	loadCss('//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css');
 
 	console.log('[InfernoShoutMod] Initializing modules');
 
@@ -45,8 +56,10 @@ require(deps, function($, InfernoShoutMod) {
 
 	require(plugins, function() {
 		var i;
+		mod.plugins = [];
 		for(i = 0; i < arguments.length; i++) {
 			arguments[i].init(mod);
+			mod.plugins.push(plugins[i]);
 		}
 		console.log('[InfernoShoutMod] ' + arguments.length + ' plugins loaded.');
 	});

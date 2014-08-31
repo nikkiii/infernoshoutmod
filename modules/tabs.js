@@ -8,9 +8,28 @@ define(['./mod'], function(InfernoShoutMod) {
 		this.tabs[id] = { title : title, content : content };
 	};
 
+	InfernoShoutMod.prototype.addStaticTab = function(id, title, content) {
+		this.staticTabs || (this.staticTabs = {})
+
+		InfernoShoutbox.append_tab('<a id="InfernoShoutMod-Tab-' + id + '" href="?" onclick="return InfernoShoutbox.show(\'' + id + '\');">' + title + '</a>');
+
+		var $new = $('#shoutbox_content_frame').clone();
+		$new.attr('id', 'infernoshoutmod_tab_content_' + id);
+		$new.html('<div id="content_box">' + content + '</div>');
+		$new.hide();
+		$new.appendTo($('#shoutbox_window'));
+
+		this.staticTabs[id] = { title : title };
+	};
+
 	InfernoShoutMod.prototype.removeTab = function(id) {
+		if (this.staticTabs[id]) {
+			$('#infernoshoutmod_tab_content_' + id).remove();
+			delete this.staticTabs[id];
+		} else if (this.tabs[id]) {
+			delete this.tabs[id];
+		}
 		InfernoShoutbox.close_tab($('#InfernoShoutMod-Tab-' + id).get());
-		delete this.tabs[id];
 	};
 
 	var TabModuleInit = function(mod) {
@@ -20,29 +39,29 @@ define(['./mod'], function(InfernoShoutMod) {
 			}
 			this.showing = what;
 			if (what == 'shoutbox') {
+				$('#shoutbox_window > span').hide();
 				this.goto_pm_window('shoutbox_frame');
 				this.shoutframe.style.display = 'block';
-				this.userframe.style.display = 'none';
-				this.contentframe.style.display = 'none';
 			} else if (what == 'activeusers') {
+				$('#shoutbox_window > span').hide();
 				this.fetch_users();
 				this.userframe.innerHTML = "<div id=\'users\'></div>";
 				this.userframe.style.display = 'block';
-				this.shoutframe.style.display = 'none';
-				this.contentframe.style.display = 'none';
 			} else if (what in oc(this.titles)) {
+				$('#shoutbox_window > span').hide();
 				this.fetch_content();
 				this.contentframe.innerHTML = "<div id=\'content_box\'></div>";
 				this.contentframe.style.display = 'block';
-				this.userframe.style.display = 'none';
-				this.shoutframe.style.display = 'none';
-			} else if (what in mod.tabs) {
+			} else if (mod.tabs && what in mod.tabs) {
+				$('#shoutbox_window > span').hide();
 				// Internal tabs
 				$(this.contentframe)
 					.html("<div id=\'content_box\'>" + mod.tabs[what].content + "</div>")
 					.css('display', 'block');
-				this.userframe.style.display = 'none';
-				this.shoutframe.style.display = 'none';
+			} else if (mod.staticTabs && what in mod.staticTabs) {
+				$('#shoutbox_window > span').hide();
+
+				$('#infernoshoutmod_tab_content_' + what).css('display', 'block');
 			}
 			return false;
 		};
