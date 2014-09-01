@@ -1,9 +1,8 @@
-define(function() {
+define(function () {
 	var html = '<h2>InfernoShoutMod Settings</h2>';
 	html += '<br />';
 	html += '<label><input id="infernoshoutmod-setting-idle" type="checkbox" checked="checked" /> Allow Idle Timeout</label><br />';
 	html += '<label><input id="infernoshoutmod-setting-effects" type="checkbox" /> Allow Username Effects</label><br />';
-	html += '<label><input id="infernoshoutmod-setting-usernamehistory" type="checkbox" /> Show Username History on hover</label><br />';
 
 	html += '<br /><h2>Plugins</h2>';
 	html += '<ul id="infernoshoutmod-setting-plugins"></ul>';

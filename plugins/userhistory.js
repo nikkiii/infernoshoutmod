@@ -1,14 +1,14 @@
 // Username History Plugin
 // Based off code by Major and Klepto
-define(['htmlparser', 'soupselect'], function(HtmlParser, SoupSelect) {
-	var UsernameHistoryPlugin = function(mod) {
+define(['htmlparser', 'soupselect'], function (HtmlParser, SoupSelect) {
+	var UsernameHistoryPlugin = function (mod) {
 		var FontWeight = {
 			NORMAL: {},
 			BOLD: {}
 		};
 
 		// Gets the width of the string; assumes a 12px arial font. XYZA
-		String.prototype.width = function(bold) {
+		String.prototype.width = function (bold) {
 			var element = $('<div>' + this + '</div>')
 				.css({'position': 'absolute', 'float': 'left', 'white-space': 'nowrap', 'visibility': 'hidden', 'font': '12px arial', 'font-weight': bold == FontWeight.BOLD ? 'bold' : 'normal'})
 				.appendTo($('body'));
@@ -27,7 +27,7 @@ define(['htmlparser', 'soupselect'], function(HtmlParser, SoupSelect) {
 
 		var ID_REGEXP = new RegExp(/pm_(\d+)/);
 
-		$('#shoutbox_frame').on('mouseenter ', 'div > a[href=#]', function() {
+		$('#shoutbox_frame').on('mouseenter ', 'div > a[href=#]', function () {
 			if (!this.onclick) {
 				return;
 			}
@@ -40,12 +40,12 @@ define(['htmlparser', 'soupselect'], function(HtmlParser, SoupSelect) {
 			$("#previousUsername").offset({ top: $(this).offset().top + 10, left: $(this).offset().left + 60});
 		});
 
-		$('#shoutbox_frame').on('mouseout', 'div > a[href=#]', function() {
+		$('#shoutbox_frame').on('mouseout', 'div > a[href=#]', function () {
 			$("#previousUsername").hide();
 		});
 
 		// Wrapper for the tab width and html.
-		function User (width, html) {
+		function User(width, html) {
 			this.width = width;
 			this.html = html;
 		}
@@ -54,7 +54,7 @@ define(['htmlparser', 'soupselect'], function(HtmlParser, SoupSelect) {
 		var cachedUsernames = [], loadingUsernames = [];
 		var loading = -1;
 
-		var setUsernameTooltip = function(id, link) {
+		var setUsernameTooltip = function (id, link) {
 			var tab = $("#previousUsername");
 			tab.show();
 
@@ -69,17 +69,17 @@ define(['htmlparser', 'soupselect'], function(HtmlParser, SoupSelect) {
 
 				loadingUsernames.push(id);
 
-				$.get("/member.php?u=" + id, function(data) {
+				$.get("/member.php?u=" + id, function (data) {
 					var usernames = "", width = NAME_LIST_PREFIX_WIDTH;
 
-					var handler = new HtmlParser.HtmlBuilder(function(err, dom) {
+					var handler = new HtmlParser.HtmlBuilder(function (err, dom) {
 						if (err) {
 							console.log(err);
 						} else {
 							var rows = SoupSelect.select(dom, '.historyblock tr');
 
-							rows.slice(1).forEach(function(row) {
-								var username =  row.children[1].children[0].data, usernameWidth = username.width();
+							rows.slice(1).forEach(function (row) {
+								var username = row.children[1].children[0].data, usernameWidth = username.width();
 								if (usernameWidth >= width) {
 									width = usernameWidth;
 								}
@@ -116,6 +116,6 @@ define(['htmlparser', 'soupselect'], function(HtmlParser, SoupSelect) {
 	};
 
 	return {
-		init : UsernameHistoryPlugin
+		init: UsernameHistoryPlugin
 	};
 });

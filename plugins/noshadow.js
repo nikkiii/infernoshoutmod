@@ -1,6 +1,6 @@
-define(function() {
-	var NoShadowPlugin = function(mod) {
-		mod.on('update_shouts', function(shouts) {
+define(function () {
+	var NoShadowPlugin = function (mod) {
+		mod.on('update_shouts', function (shouts) {
 			if (!InfernoShoutbox.effects) {
 				$('span', InfernoShoutbox.shoutframe).each(function (index) {
 					if ($(this).css('text-shadow')) {
@@ -12,6 +12,6 @@ define(function() {
 	};
 
 	return {
-		init : NoShadowPlugin
+		init: NoShadowPlugin
 	};
 });

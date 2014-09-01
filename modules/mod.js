@@ -15,6 +15,8 @@ define(['minivents'], function (Events) {
 			this.posting_shout = true;
 			this.set_loader('');
 
+			message = InfernoShoutbox.shout_params.prefix + message + InfernoShoutbox.shout_params.suffix;
+
 			this.shout.ajax = new vB_AJAX_Handler(true);
 			this.shout.ajax.onreadystatechange(InfernoShoutbox.shout_posted);
 			this.shout.ajax.send('infernoshout.php', 'do=shout&message=' + PHP.urlencode(message) + '&');
@@ -98,8 +100,6 @@ define(['minivents'], function (Events) {
 					return false;
 				}
 			}
-
-			message = this.shout_params.prefix + message + this.shout_params.suffix;
 
 			this.postShout(message);
 			return false;
