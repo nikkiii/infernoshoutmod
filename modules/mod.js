@@ -1,17 +1,17 @@
-define(['minivents'], function (Events) {
+define(['minivents'], function(Events) {
 	function InfernoShoutMod() {
 		this.commands = {};
 		this.events = new Events(this);
 	}
 
-	InfernoShoutMod.prototype.init = function () {
+	InfernoShoutMod.prototype.init = function() {
 		var self = this;
-		InfernoShoutbox.setUserGroup = function (id) {
+		InfernoShoutbox.setUserGroup = function(id) {
 			this.shout.ajax = new vB_AJAX_Handler(true);
 			this.shout.ajax.send('profile.php', 'do=updatedisplaygroup&usergroupid=' + id + '&');
 		};
 
-		InfernoShoutbox.postShout = function (message) {
+		InfernoShoutbox.postShout = function(message) {
 			this.posting_shout = true;
 			this.set_loader('');
 
@@ -24,7 +24,7 @@ define(['minivents'], function (Events) {
 			this.clear();
 		};
 
-		InfernoShoutbox.postEditShout = function (shoutid, message) {
+		InfernoShoutbox.postEditShout = function(shoutid, message) {
 			this.editshout.ajax = new vB_AJAX_Handler(true);
 			this.editshout.ajax.shoutid = shoutid;
 			this.editshout.ajax.dodelete = 0;
@@ -32,7 +32,7 @@ define(['minivents'], function (Events) {
 			this.editshout.ajax.send('infernoshout.php', 'do=doeditshout&shoutid=' + shoutid + '&shout=' + message + '&delete=0&');
 		};
 
-		InfernoShoutbox.postDeleteShout = function (shoutid) {
+		InfernoShoutbox.postDeleteShout = function(shoutid) {
 			this.editshout.ajax = new vB_AJAX_Handler(true);
 			this.editshout.ajax.shoutid = shoutid;
 			this.editshout.ajax.dodelete = 1;
@@ -40,7 +40,7 @@ define(['minivents'], function (Events) {
 			this.editshout.ajax.send('infernoshout.php', 'do=doeditshout&shoutid=' + shoutid + '&shout=(deleted message)&delete=1&');
 		};
 
-		InfernoShoutbox.update_shouts = function (shouts) {
+		InfernoShoutbox.update_shouts = function(shouts) {
 			this.shoutframe.innerHTML = shouts;
 
 			if (this.newestbottom && this.shoutframe.scrollTop < this.shoutframe.scrollHeight) {
@@ -51,7 +51,7 @@ define(['minivents'], function (Events) {
 		};
 
 		// BETTER pming.
-		InfernoShoutbox.open_pm_tab = function (pmid, username) {
+		InfernoShoutbox.open_pm_tab = function(pmid, username) {
 			if (!this.pm_tabs) {
 				this.pm_tabs = {};
 			}
@@ -66,7 +66,7 @@ define(['minivents'], function (Events) {
 			return false;
 		};
 
-		InfernoShoutbox.shout = function () {
+		InfernoShoutbox.shout = function() {
 			if (this.posting_shout) {
 				this.show_notice('A previous message is still being submitted.');
 				return false;

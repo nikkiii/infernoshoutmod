@@ -1,8 +1,8 @@
-define(function () {
+define(function() {
 	return {
-		init: function () {
+		init: function() {
 			// jQuery for frontend
-			$('#infernoshoutmod-plugin-add').click(function (e) {
+			$('#infernoshoutmod-plugin-add').click(function(e) {
 				e.preventDefault();
 				var url = $('#infernoshoutmod-plugin-url').val();
 				var $li = $('<li />');
@@ -12,7 +12,7 @@ define(function () {
 				$('#infernoshoutmod-setting-plugins').trigger('change');
 				$('#infernoshoutmod-plugin-url').val('');
 			});
-			$(document).on('click', '#infernoshoutmod-plugin-remove', function (e) {
+			$(document).on('click', '#infernoshoutmod-plugin-remove', function(e) {
 				e.preventDefault();
 				var $elem = $(this).parent();
 				var url = $elem.data('url');

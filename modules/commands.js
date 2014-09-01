@@ -1,5 +1,5 @@
-define(['./mod'], function (InfernoShoutMod) {
-	InfernoShoutMod.prototype.handleCommand = function (string) {
+define(['./mod'], function(InfernoShoutMod) {
+	InfernoShoutMod.prototype.handleCommand = function(string) {
 		var args = this.parseCommandArguments(string);
 		var cmd = args[0];
 
@@ -11,11 +11,11 @@ define(['./mod'], function (InfernoShoutMod) {
 		return false;
 	};
 
-	InfernoShoutMod.prototype.registerCommand = function (command, func) {
+	InfernoShoutMod.prototype.registerCommand = function(command, func) {
 		this.commands[command] = func;
 	};
 
-	InfernoShoutMod.prototype.parseCommandArguments = function (command) {
+	InfernoShoutMod.prototype.parseCommandArguments = function(command) {
 		var args = [];
 
 		var buf = '';

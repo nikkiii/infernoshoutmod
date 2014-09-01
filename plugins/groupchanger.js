@@ -1,5 +1,5 @@
-define(function () {
-	var GroupChangerPlugin = function (mod) {
+define(function() {
+	var GroupChangerPlugin = function(mod) {
 		var usergroups = {
 			'member': 2,
 			'appellate': 5,
@@ -19,13 +19,13 @@ define(function () {
 		};
 
 		for (var x in usergroups) {
-			mod.registerCommand(x, function (command, args) {
+			mod.registerCommand(x, function(command, args) {
 				InfernoShoutbox.setUserGroup(usergroups[command]);
 			});
 		}
 
-		$.get('/profile.php?do=editusergroups', function (res) {
-			$('input[name=usergroupid]', res).each(function (index) {
+		$.get('/profile.php?do=editusergroups', function(res) {
+			$('input[name=usergroupid]', res).each(function(index) {
 				var id = $(this).val();
 
 				var element = $(this).parent().parent().parent().children('.col1');

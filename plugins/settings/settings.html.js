@@ -1,4 +1,4 @@
-define(function () {
+define(function() {
 	var html = '<h2>InfernoShoutMod Settings</h2>';
 	html += '<br />';
 	html += '<label><input id="infernoshoutmod-setting-idle" type="checkbox" checked="checked" /> Allow Idle Timeout</label><br />';

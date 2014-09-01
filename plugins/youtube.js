@@ -1,6 +1,6 @@
-define(['../modules/util'], function (Util) {
-	var YoutubePlugin = function (mod) {
-		mod.on('shout', function (ctx, evt) {
+define(['../modules/util'], function(Util) {
+	var YoutubePlugin = function(mod) {
+		mod.on('shout', function(ctx, evt) {
 			var message = evt.message;
 
 			if (message.indexOf('youtube.com') == -1 && message.indexOf('youtu.be') == -1) {
@@ -48,7 +48,7 @@ define(['../modules/util'], function (Util) {
 				url: '//gdata.youtube.com/feeds/api/videos',
 				data: { q: video, alt: 'json' },
 				dataType: 'jsonp',
-				success: function (result) {
+				success: function(result) {
 					if (result['feed'] && result['feed']['entry'] && result['feed']['entry'].length > 0) {
 						var length = parseInt(result['feed']['entry'][0]['media$group']['media$content'][0]['duration']);
 						var title = result['feed']['entry'][0]['title']['$t'];

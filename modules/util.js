@@ -1,6 +1,6 @@
-define(function () {
+define(function() {
 	return {
-		parseQueryString: function (query) {
+		parseQueryString: function(query) {
 			var out = {};
 			var vars = query.split('&');
 			for (var i = 0; i < vars.length; i++) {
@@ -11,7 +11,7 @@ define(function () {
 			}
 			return out;
 		},
-		filterTitle: function (title) {
+		filterTitle: function(title) {
 			var replaced = title.replace(new RegExp("[\\(\\[][a-zA-Z ]+[\\)\\]]", "g"), ""); // |((L|l)yrics)
 			var parts = replaced.split(" ");
 
