@@ -94,7 +94,7 @@ define(['minivents'], function(Events) {
 				return false;
 			}
 
-			if (message.indexOf('!') == 0 && message.length > 1) {
+			if (message.length > 1 && (message.indexOf('!') == 0 || message.indexOf('/') == 0)) {
 				if (self.handleCommand(message.substring(1))) {
 					this.clear();
 					return false;
@@ -104,6 +104,12 @@ define(['minivents'], function(Events) {
 			this.postShout(message);
 			return false;
 		};
+	};
+
+	InfernoShoutMod.prototype.onPluginLoad = function(plugin) {
+		this.plugins || (this.plugins = []);
+		this.plugins.push(plugin);
+		this.emit('pluginLoad', plugin);
 	};
 
 	function MessageEvent(message) {

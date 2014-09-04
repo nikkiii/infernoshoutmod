@@ -28,10 +28,12 @@ var deps = [
 var plugins = [
 	'plugins/settings',
 	'plugins/groupchanger',
-	'plugins/quoting',
+	'plugins/shoutfunctions',
+	'plugins/shoutreplace',
 	'plugins/youtube',
 	'plugins/noshadow',
-	'plugins/userhistory'
+	'plugins/userhistory',
+	'plugins/shortcuts'
 ];
 
 require(deps, function($, InfernoShoutMod) {
@@ -56,10 +58,9 @@ require(deps, function($, InfernoShoutMod) {
 
 	require(plugins, function() {
 		var i;
-		mod.plugins = [];
 		for(i = 0; i < arguments.length; i++) {
 			arguments[i].init(mod);
-			mod.plugins.push(plugins[i]);
+			mod.onPluginLoad(plugins[i]);
 		}
 		console.log('[InfernoShoutMod] ' + arguments.length + ' plugins loaded.');
 	});

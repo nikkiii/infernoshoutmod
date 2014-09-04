@@ -72,9 +72,22 @@ define(['text!./settings/settings.html', './settings/frontend'], function(settin
 			};
 		};
 
+		var initializedSettings = [];
+
 		for (var id in mod.settings) {
 			LoadSetting(id, mod.settings[id]);
+			initializedSettings.push(id);
 		}
+
+		// Hook plugins loading so we can initialize their settings
+		mod.on('pluginLoad', function(plugin) {
+			for (var id in mod.settings) {
+				if (initializedSettings.indexOf(id) == -1) {
+					LoadSetting(id, mod.settings[id]);
+					initializedSettings.push(id);
+				}
+			}
+		});
 	};
 
 	var InfernoShoutModSettings = function(mod) {
@@ -116,10 +129,6 @@ define(['text!./settings/settings.html', './settings/frontend'], function(settin
 			InfernoShoutbox.idletimelimit = val ? InfernoShoutbox.initialIdleTimeLimit : 2147483647;
 		});
 
-		mod.addSetting('effects', 'checkbox', function(val) {
-			InfernoShoutbox.effects = val;
-		});
-
 		mod.addSetting('plugins', 'pluginlist', function(val) {
 			var load = [];
 			for (var i = 0; i < val.length; i++) {
@@ -128,11 +137,14 @@ define(['text!./settings/settings.html', './settings/frontend'], function(settin
 				}
 			}
 			require(load, function() {
+				if (arguments.length < 1) {
+					return;
+				}
 				var i;
-				var list = [];
 				for (i = 0; i < arguments.length; i++) {
 					arguments[i].init(mod);
-					mod.plugins.push(val[i]);
+
+					mod.onPluginLoad(val[i]);
 				}
 			});
 		});

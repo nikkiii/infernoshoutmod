@@ -24,6 +24,8 @@ define(function() {
 			});
 		}
 
+		// Code for a possible customization system
+		/*
 		$.get('/profile.php?do=editusergroups', function(res) {
 			$('input[name=usergroupid]', res).each(function(index) {
 				var id = $(this).val();
@@ -38,6 +40,7 @@ define(function() {
 				console.log("Group " + $(this).val() + " - " + title);
 			});
 		});
+		*/
 	};
 
 	return {
