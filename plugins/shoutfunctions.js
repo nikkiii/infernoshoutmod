@@ -1,8 +1,9 @@
 define(function() {
-	var ShoutQuotingPlugin = function(mod) {
+	var ShoutFunctionPlugin = function(mod) {
 		var hoverIndex = -1,
 			quoteElement = $('<span class="quote"> <a href="#"><i class="fa fa-comment-o"></i></a></span>'),
-			deleteElement = $('<span class="delete"> <a href="#"><i class="fa fa-trash"></i></a></span>');
+			deleteElement = $('<span class="delete"> <a href="#"><i class="fa fa-trash"></i></a></span>'),
+			ignoreElement = $('<span class="ignore"> <a href="#"><i class="fa fa-ban"></i></a></span>');
 
 		var promptDelete = true;
 
@@ -13,6 +14,8 @@ define(function() {
 
 					if (this.ondblclick) {
 						$(this).append(deleteElement);
+					} else {
+						$(this).append(ignoreElement);
 					}
 				});
 			}
@@ -29,6 +32,8 @@ define(function() {
 
 			if (this.ondblclick) {
 				$(this).append(deleteElement);
+			} else {
+				$(this).append(ignoreElement);
 			}
 		});
 
@@ -36,6 +41,7 @@ define(function() {
 			hoverIndex = -1;
 			$(this).children('.quote').remove();
 			$(this).children('.delete').remove();
+			$(this).children('.ignore').remove();
 		});
 
 		$('#shoutbox_frame').on('click', 'div.smallfont > .quote > a', function(e) {
@@ -66,12 +72,33 @@ define(function() {
 			}
 		});
 
+		var ID_REGEXP = new RegExp(/pm_(\d+)/);
+		$('#shoutbox_frame').on('click', 'div.smallfont > .ignore > a', function(e) {
+			e.preventDefault();
+
+			var id = ID_REGEXP.exec($(this).closest('.smallfont').html());
+
+			if (!id) {
+				return;
+			}
+
+			id = id[1];
+
+			var confirmation = confirm('Ignore user ' + id + '?');
+
+			if (!confirmation) {
+				return;
+			}
+
+			mod.handleCommand('ignore ' + id);
+		});
+
 		mod.addSetting('promptdelete', 'checkbox', function(val) {
 			promptDelete = val;
 		});
 	};
 
 	return {
-		init: ShoutQuotingPlugin
+		init: ShoutFunctionPlugin
 	};
 });

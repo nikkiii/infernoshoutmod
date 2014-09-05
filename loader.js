@@ -6,7 +6,8 @@ require.config({
 		jquery : 'http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min',
 		minivents : 'lib/minivents',
 		htmlparser : 'lib/htmlparser',
-		soupselect : 'lib/soupselect'
+		soupselect : 'lib/soupselect',
+		utils : 'lib/utils'
 	}
 });
 
@@ -28,6 +29,7 @@ var deps = [
 
 var plugins = [
 	'plugins/groupchanger',
+	'plugins/ignores',
 	'plugins/shoutfunctions',
 	'plugins/shoutreplace',
 	'plugins/youtube',

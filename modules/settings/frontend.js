@@ -1,6 +1,6 @@
 define(function() {
 	return {
-		init: function() {
+		init: function(mod) {
 			// jQuery for frontend
 			$('#infernoshoutmod-plugin-add').click(function(e) {
 				e.preventDefault();
@@ -19,6 +19,15 @@ define(function() {
 				$('#infernoshoutmod-setting-plugins').trigger('change');
 				alert('Plugin removed.');
 				location.reload();
+			});
+			$(document).on('click', '#infernoshoutmod-ignore-remove', function(e) {
+				e.preventDefault();
+				var $elem = $(this).parent();
+				$elem.remove();
+				var user = $(this).parent().children('a:first').text();
+
+				mod.handleCommand('unignore ' + user);
+				$('#infernoshoutmod-setting-ignored-users').trigger('change');
 			});
 		}
 	}

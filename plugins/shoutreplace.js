@@ -1,10 +1,13 @@
 define(function() {
 	var ShoutReplacePlugin = function(mod) {
 		var ID_REGEXP = new RegExp(/pm_(\d+)/);
-		$.expr[':'].isShoutUser = function(obj, index, meta, stack){
+
+		$.expr[':'].isOwnUser = function(obj, index, meta, stack){
 			if (obj.ondblclick == undefined || typeof(obj.ondblclick) !== 'function') {
 				return false;
 			}
+
+			var obj = $('a:first', obj).get(0);
 
 			if (!obj.onclick) {
 				return;
@@ -12,7 +15,7 @@ define(function() {
 
 			var matches = ID_REGEXP.exec(new String(obj.onclick));
 
-			return matches[1] === meta;
+			return parseInt(matches[1]) === mod.userId;
 		};
 
 		function preg_quote(str, delimiter) {
@@ -40,7 +43,7 @@ define(function() {
 			var match = REPLACE_REGEXP.exec(evt.message);
 
 			if (match) {
-				var $row = $('#shoutbox_frame > .smallfont:isShoutUser(' + mod.userId + ')');
+				var $row = $('#shoutbox_frame > .smallfont:isOwnUser');
 
 				if ($row.length < 1) {
 					return;

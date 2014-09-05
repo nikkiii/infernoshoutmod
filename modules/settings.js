@@ -2,16 +2,14 @@ define(['./mod', 'text!./settings/settings.html', './settings/frontend'], functi
 	var valParser = function($elem) {
 		return $elem.val();
 	};
+
 	var settingsParsers = {
 		'checkbox': function($elem) {
 			return $elem.is(':checked') ? true : false;
 		},
-		'combobox' : valParser,
-		'text' : valParser,
 		'number' : function($elem) {
 			return parseInt($elem.val());
-		},
-		'textarea' : valParser
+		}
 	};
 
 	var valPopulator = function($elem, value) {
@@ -21,11 +19,7 @@ define(['./mod', 'text!./settings/settings.html', './settings/frontend'], functi
 	var valuePopulators = {
 		'checkbox': function($elem, value) {
 			$elem.prop('checked', value ? true : false);
-		},
-		'combobox' : valPopulator,
-		'text' : valPopulator,
-		'number' : valPopulator,
-		'textarea' : valPopulator
+		}
 	};
 
 	InfernoShoutMod.prototype.addSetting = function(id, type, callback) {
@@ -46,6 +40,8 @@ define(['./mod', 'text!./settings/settings.html', './settings/frontend'], functi
 				parser = settingsParsers[info.type];
 			} else if (typeof(info.type) == 'object' && 'parser' in info.type) {
 				parser = info.type.parser;
+			} else {
+				parser = valParser;
 			}
 
 			if (parser === false) {
@@ -80,6 +76,8 @@ define(['./mod', 'text!./settings/settings.html', './settings/frontend'], functi
 						populator = valuePopulators[setting.type];
 					} else if (typeof(setting.type) == 'object' && 'populator' in setting.type) {
 						populator = setting.type.populator;
+					} else {
+						populator = valPopulator;
 					}
 
 					if (populator === false) {
@@ -91,6 +89,7 @@ define(['./mod', 'text!./settings/settings.html', './settings/frontend'], functi
 					setting.callback(result.value);
 				}
 
+				// We can also trigger this via .trigger('change'), so it's the best universal method
 				$elem.change(function() {
 					ParseSetting(id, setting, $(this));
 				});
@@ -128,7 +127,7 @@ define(['./mod', 'text!./settings/settings.html', './settings/frontend'], functi
 		}
 
 		mod.addStaticTab('settings', 'InfernoShoutMod', settingsHtml);
-		settingsJs.init();
+		settingsJs.init(mod);
 
 		var open = indexedDB.open('infernoshoutmod', 1);
 
