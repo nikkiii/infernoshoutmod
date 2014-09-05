@@ -1,4 +1,4 @@
-define(['text!./settings/settings.html', './settings/frontend'], function(settingsHtml, settingsJs) {
+define(['./mod', 'text!./settings/settings.html', './settings/frontend'], function(InfernoShoutMod, settingsHtml, settingsJs) {
 	var valParser = function($elem) {
 		return $elem.val();
 	};
@@ -28,11 +28,13 @@ define(['text!./settings/settings.html', './settings/frontend'], function(settin
 		'textarea' : valPopulator
 	};
 
+	InfernoShoutMod.prototype.addSetting = function(id, type, callback) {
+		this.settings || (this.settings = {});
+
+		this.settings[id] = { 'type': type, 'callback': callback };
+	};
+
 	var InfernoShoutModDbLoad = function(mod, db) {
-		var settings = db.transaction(['settings'], 'readonly');
-
-		var store = settings.objectStore('settings');
-
 		var ParseSetting = function(id, info, $elem) {
 			var transaction = db.transaction(['settings'], 'readwrite');
 
@@ -61,6 +63,10 @@ define(['text!./settings/settings.html', './settings/frontend'], function(settin
 
 		var LoadSetting = function(id, setting) {
 			var $elem = $('#infernoshoutmod-setting-' + id);
+
+			var settings = db.transaction(['settings'], 'readonly');
+
+			var store = settings.objectStore('settings');
 
 			var get = store.get(id);
 
@@ -115,7 +121,7 @@ define(['text!./settings/settings.html', './settings/frontend'], function(settin
 		});
 	};
 
-	var InfernoShoutModSettings = function(mod) {
+	var SettingsModuleInit = function(mod) {
 		if (!("indexedDB" in window)) {
 			console.log('No IndexedDB support, settings disabled.');
 			return;
@@ -142,12 +148,6 @@ define(['text!./settings/settings.html', './settings/frontend'], function(settin
 			console.log('[InfernoShoutMod] Unable to open settings db.');
 		};
 
-		mod.addSetting = function(id, type, callback) {
-			this.settings || (this.settings = {});
-
-			this.settings[id] = { 'type': type, 'callback': callback };
-		};
-
 		InfernoShoutbox.initialIdleTimeLimit = InfernoShoutbox.idletimelimit;
 
 		mod.addSetting('idle', 'checkbox', function(val) {
@@ -156,6 +156,6 @@ define(['text!./settings/settings.html', './settings/frontend'], function(settin
 	};
 
 	return {
-		init: InfernoShoutModSettings
+		init: SettingsModuleInit
 	};
 });

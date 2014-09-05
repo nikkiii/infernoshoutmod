@@ -1,7 +1,7 @@
 define(function() {
 	var ShoutReplacePlugin = function(mod) {
 		var ID_REGEXP = new RegExp(/pm_(\d+)/);
-		$.expr[':'].isUser = function(obj, index, meta, stack){
+		$.expr[':'].isShoutUser = function(obj, index, meta, stack){
 			if (obj.ondblclick == undefined || typeof(obj.ondblclick) !== 'function') {
 				return false;
 			}
@@ -40,7 +40,7 @@ define(function() {
 			var match = REPLACE_REGEXP.exec(evt.message);
 
 			if (match) {
-				var $row = $('#shoutbox_frame > .smallfont:isUser(' + mod.userId + ')');
+				var $row = $('#shoutbox_frame > .smallfont:isShoutUser(' + mod.userId + ')');
 
 				if ($row.length < 1) {
 					return;

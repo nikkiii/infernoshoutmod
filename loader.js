@@ -22,11 +22,11 @@ var deps = [
 	'jquery',
 	'modules/mod',
 	'modules/commands',
-	'modules/tabs'
+	'modules/tabs',
+	'modules/settings'
 ];
 
 var plugins = [
-	'plugins/settings',
 	'plugins/groupchanger',
 	'plugins/shoutfunctions',
 	'plugins/shoutreplace',

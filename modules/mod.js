@@ -1,7 +1,7 @@
 define(['minivents'], function(Events) {
 	function InfernoShoutMod() {
 		this.commands = {};
-		this.user = false;
+		this.userId = -1;
 		this.events = new Events(this);
 	}
 
