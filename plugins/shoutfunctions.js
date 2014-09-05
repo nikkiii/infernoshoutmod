@@ -1,4 +1,7 @@
 define(function() {
+	var ID_REGEXP = new RegExp(/pm_(\d+)/),
+		shoutIdRegex = new RegExp(/edit_shout\((\d+)\)/);
+
 	var ShoutFunctionPlugin = function(mod) {
 		var hoverIndex = -1,
 			quoteElement = $('<span class="quote"> <a href="#"><i class="fa fa-comment-o"></i></a></span>'),
@@ -10,38 +13,27 @@ define(function() {
 		mod.on('update_shouts', function(shouts) {
 			if (hoverIndex != -1) {
 				$('#shoutbox_frame > .smallfont:nth-child(' + hoverIndex + ')').each(function(index) {
-					$(this).append(quoteElement);
-
-					if (this.ondblclick) {
-						$(this).append(deleteElement);
-					} else {
-						$(this).append(ignoreElement);
-					}
+					$(this).append(quoteElement).append(this.ondblclick ? deleteElement : ignoreElement);
 				});
 			}
 		});
 
 		$('#shoutbox_frame').on('mouseenter', 'div.smallfont:not(:first)', function() {
-			if ($(this).children('.quote').length > 0) {
+			var $this = $(this);
+
+			if ($this.children('.quote').length > 0) {
 				return;
 			}
 
-			hoverIndex = $(this).index() + 1;
+			hoverIndex = $this.index() + 1;
 
-			$(this).append(quoteElement);
-
-			if (this.ondblclick) {
-				$(this).append(deleteElement);
-			} else {
-				$(this).append(ignoreElement);
-			}
+			$this.append(quoteElement).append(this.ondblclick ? deleteElement : ignoreElement);
 		});
 
 		$('#shoutbox_frame').on('mouseleave', 'div.smallfont:not(:first)', function() {
+			$(this).children('.quote, .delete, .ignore').remove();
+
 			hoverIndex = -1;
-			$(this).children('.quote').remove();
-			$(this).children('.delete').remove();
-			$(this).children('.ignore').remove();
 		});
 
 		$('#shoutbox_frame').on('click', 'div.smallfont > .quote > a', function(e) {
@@ -50,7 +42,6 @@ define(function() {
 			InfernoShoutbox.editor.value = PHP.trim($(this).closest('.smallfont').text());
 		});
 
-		var shoutIdRegex = new RegExp(/edit_shout\((\d+)\)/);
 		$('#shoutbox_frame').on('click', 'div.smallfont > .delete > a', function(e) {
 			e.preventDefault();
 
@@ -64,19 +55,22 @@ define(function() {
 
 			var confirmation = !promptDelete || confirm('Delete this shout?');
 
-			if (confirmation) {
-				var id = shoutIdRegex.exec(dblclick);
-				id = id[1];
-
-				InfernoShoutbox.postDeleteShout(id);
+			if (!confirmation) {
+				return;
 			}
+
+			var id = shoutIdRegex.exec(dblclick);
+			id = id[1];
+
+			InfernoShoutbox.postDeleteShout(id);
 		});
 
-		var ID_REGEXP = new RegExp(/pm_(\d+)/);
 		$('#shoutbox_frame').on('click', 'div.smallfont > .ignore > a', function(e) {
 			e.preventDefault();
 
-			var id = ID_REGEXP.exec($(this).closest('.smallfont').html());
+			var $this = $(this);
+
+			var id = ID_REGEXP.exec($this.closest('.smallfont').html());
 
 			if (!id) {
 				return;
@@ -84,7 +78,7 @@ define(function() {
 
 			id = id[1];
 
-			var confirmation = confirm('Ignore user ' + id + '?');
+			var confirmation = confirm('Ignore ' + PHP.trim($this.closest('.smallfont').children('a:first').text()) + '?');
 
 			if (!confirmation) {
 				return;

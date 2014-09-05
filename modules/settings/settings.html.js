@@ -1,5 +1,5 @@
 define(function() {
-	var html = '<h2>InfernoShoutMod Settings</h2>';
+	var html = '<h2><a href="http://www.rune-server.org/programming/website-development/projects/564248-infernoshoutmod.html">InfernoShoutMod</a></h2>';
 	html += '<br />';
 	html += '<label><input id="infernoshoutmod-setting-idle" type="checkbox" checked="checked" /> Allow Idle Timeout</label><br />';
 	html += '<label><input id="infernoshoutmod-setting-effects" type="checkbox" /> Allow Username Effects</label><br />';

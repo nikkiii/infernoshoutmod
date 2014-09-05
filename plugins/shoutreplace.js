@@ -1,4 +1,7 @@
 define(function() {
+	var REPLACE_REGEXP = new RegExp(/^s\/(.*)\/(.*)\/$/),
+		shoutIdRegex = new RegExp(/edit_shout\((\d+)\)/);
+
 	var ShoutReplacePlugin = function(mod) {
 		var ID_REGEXP = new RegExp(/pm_(\d+)/);
 
@@ -35,9 +38,6 @@ define(function() {
 			return String(str)
 				.replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + (delimiter || '') + '-]', 'g'), '\\$&');
 		}
-
-		var REPLACE_REGEXP = new RegExp(/^s\/(.*)\/(.*)\/$/),
-			shoutIdRegex = new RegExp(/edit_shout\((\d+)\)/);
 
 		mod.on('shout', function(ctx, evt) {
 			var match = REPLACE_REGEXP.exec(evt.message);
