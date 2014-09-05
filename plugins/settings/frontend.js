@@ -15,7 +15,6 @@ define(function() {
 			$(document).on('click', '#infernoshoutmod-plugin-remove', function(e) {
 				e.preventDefault();
 				var $elem = $(this).parent();
-				var url = $elem.data('url');
 				$elem.remove();
 				$('#infernoshoutmod-setting-plugins').trigger('change');
 				alert('Plugin removed.');

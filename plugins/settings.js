@@ -1,30 +1,31 @@
 define(['text!./settings/settings.html', './settings/frontend'], function(settingsHtml, settingsJs) {
+	var valParser = function($elem) {
+		return $elem.val();
+	};
 	var settingsParsers = {
 		'checkbox': function($elem) {
 			return $elem.is(':checked') ? true : false;
 		},
-		'pluginlist': function($elem) {
-			var urls = [];
-			$elem.children('li').each(function(index) {
-				urls.push($(this).data('url'));
-			});
-			return urls;
-		}
+		'combobox' : valParser,
+		'text' : valParser,
+		'number' : function($elem) {
+			return parseInt($elem.val());
+		},
+		'textarea' : valParser
+	};
+
+	var valPopulator = function($elem, value) {
+		$elem.val(value);
 	};
 
 	var valuePopulators = {
 		'checkbox': function($elem, value) {
 			$elem.prop('checked', value ? true : false);
 		},
-		'pluginlist': function($elem, value) {
-			var i;
-			for (i = 0; i < value.length; i++) {
-				var $li = $('<li />');
-				$li.html(value[i].substring(value[i].lastIndexOf('/') + 1) + ' <a id="infernoshoutmod-plugin-remove" href="#"><i class="fa fa-times"></i></a>');
-				$li.data('url', value[i]);
-				$li.appendTo($elem);
-			}
-		}
+		'combobox' : valPopulator,
+		'text' : valPopulator,
+		'number' : valPopulator,
+		'textarea' : valPopulator
 	};
 
 	var InfernoShoutModDbLoad = function(mod, db) {
@@ -37,7 +38,19 @@ define(['text!./settings/settings.html', './settings/frontend'], function(settin
 
 			var store = transaction.objectStore('settings');
 
-			var value = settingsParsers[info.type]($elem);
+			var parser = false;
+
+			if (info.type in settingsParsers) {
+				parser = settingsParsers[info.type];
+			} else if (typeof(info.type) == 'object' && 'parser' in info.type) {
+				parser = info.type.parser;
+			}
+
+			if (parser === false) {
+				return;
+			}
+
+			var value = parser($elem);
 
 			var req = store.put({ 'setting': id, 'value': value});
 
@@ -55,7 +68,19 @@ define(['text!./settings/settings.html', './settings/frontend'], function(settin
 				var result = e.target.result
 
 				if (result) {
-					valuePopulators[setting.type]($elem, result.value);
+					var populator = false;
+
+					if (setting.type in valuePopulators) {
+						populator = valuePopulators[setting.type];
+					} else if (typeof(setting.type) == 'object' && 'populator' in setting.type) {
+						populator = setting.type.populator;
+					}
+
+					if (populator === false) {
+						return;
+					}
+
+					populator($elem, result.value);
 
 					setting.callback(result.value);
 				}
@@ -127,26 +152,6 @@ define(['text!./settings/settings.html', './settings/frontend'], function(settin
 
 		mod.addSetting('idle', 'checkbox', function(val) {
 			InfernoShoutbox.idletimelimit = val ? InfernoShoutbox.initialIdleTimeLimit : 2147483647;
-		});
-
-		mod.addSetting('plugins', 'pluginlist', function(val) {
-			var load = [];
-			for (var i = 0; i < val.length; i++) {
-				if (!(val[i] in mod.plugins)) {
-					load.push(val[i]);
-				}
-			}
-			require(load, function() {
-				if (arguments.length < 1) {
-					return;
-				}
-				var i;
-				for (i = 0; i < arguments.length; i++) {
-					arguments[i].init(mod);
-
-					mod.onPluginLoad(val[i]);
-				}
-			});
 		});
 	};
 

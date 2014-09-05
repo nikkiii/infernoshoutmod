@@ -33,7 +33,8 @@ var plugins = [
 	'plugins/youtube',
 	'plugins/noshadow',
 	'plugins/userhistory',
-	'plugins/shortcuts'
+	'plugins/shortcuts',
+	'plugins/customloader' // Load custom plugins last
 ];
 
 require(deps, function($, InfernoShoutMod) {

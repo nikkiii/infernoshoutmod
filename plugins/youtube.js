@@ -46,7 +46,10 @@ define(['../modules/util'], function(Util) {
 
 			$.ajax({
 				url: '//gdata.youtube.com/feeds/api/videos',
-				data: { q: video, alt: 'json' },
+				data: {
+					q: video,
+					alt: 'json'
+				},
 				dataType: 'jsonp',
 				success: function(result) {
 					if (result['feed'] && result['feed']['entry'] && result['feed']['entry'].length > 0) {

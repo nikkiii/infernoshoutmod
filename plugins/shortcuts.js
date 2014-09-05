@@ -8,34 +8,35 @@ define(function() {
 			InfernoShoutbox.postShout('http://www.rune-server.org/programming/website-development/projects/564248-infernoshoutmod.html');
 		});
 
-		var PrefixHandler = function(cmd, args) {
+		mod.registerCommand('prefix', function(cmd, args) {
 			InfernoShoutbox.shout_params.prefix = args.join(' ');
-		};
+		});
 
-		mod.registerCommand('pre', PrefixHandler);
-		mod.registerCommand('prefix', PrefixHandler);
-
-		var SuffixHandler =  function(cmd, args) {
+		mod.registerCommand('suffix', function(cmd, args) {
 			InfernoShoutbox.shout_params.suffix = args.join(' ');
-		};
-
-		mod.registerCommand('su', SuffixHandler);
-		mod.registerCommand('suffix', SuffixHandler);
+		});
 
 		var shorthands = {
 			'p' : 'prune',
 			'b' : 'ban',
-			'u' : 'unban'
+			'ub' : 'unban',
+
+			'pre' : 'prefix',
+			'su' : 'suffix'
 		};
 
 		var shortExec = function(cmd, args) {
-			var argStr = '';
+			var commandStr = '/' + shorthands[cmd];
 
 			if (args.length > 0) {
-				argStr = ' ' + args.join(' ');
+				commandStr += ' ' + args.join(' ');
 			}
 
-			InfernoShoutbox.shout('/' + shorthands[cmd] + argStr);
+			if (mod.handleCommand(commandStr)) {
+				return;
+			}
+
+			InfernoShoutbox.postShout(commandStr);
 		};
 
 		for (var short in shorthands) {

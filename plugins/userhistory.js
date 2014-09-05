@@ -27,7 +27,7 @@ define(['htmlparser', 'soupselect'], function(HtmlParser, SoupSelect) {
 
 		var ID_REGEXP = new RegExp(/pm_(\d+)/);
 
-		$('#shoutbox_frame').on('mouseenter ', 'div > a[href=#]', function() {
+		$('#shoutbox_frame').on('mouseenter', 'div > a[href=#]', function() {
 			if (!this.onclick) {
 				return;
 			}

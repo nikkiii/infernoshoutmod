@@ -1,6 +1,7 @@
 define(['minivents'], function(Events) {
 	function InfernoShoutMod() {
 		this.commands = {};
+		this.user = false;
 		this.events = new Events(this);
 	}
 
@@ -104,6 +105,15 @@ define(['minivents'], function(Events) {
 			this.postShout(message);
 			return false;
 		};
+
+		// Load some information
+		$.get('infernoshout.php?do=detach', function(res) {
+			var match = /var LOGGEDIN = (\d+) > 0 \? true : false;/.exec(res);
+
+			if (match) {
+				self.userId = parseInt(match[1]);
+			}
+		});
 	};
 
 	InfernoShoutMod.prototype.onPluginLoad = function(plugin) {
