@@ -1,4 +1,4 @@
-define(['./mod', 'text!./settings/settings.html', './settings/frontend'], function(InfernoShoutMod, settingsHtml, settingsJs) {
+define(['./mod', 'idb', 'text!./settings/settings.html', './settings/frontend'], function(InfernoShoutMod, idb, settingsHtml, settingsJs) {
 	var valParser = function($elem) {
 		return $elem.val();
 	};
@@ -7,7 +7,7 @@ define(['./mod', 'text!./settings/settings.html', './settings/frontend'], functi
 		'checkbox': function($elem) {
 			return $elem.is(':checked') ? true : false;
 		},
-		'number' : function($elem) {
+		'number': function($elem) {
 			return parseInt($elem.val());
 		}
 	};
@@ -22,18 +22,20 @@ define(['./mod', 'text!./settings/settings.html', './settings/frontend'], functi
 		}
 	};
 
-	InfernoShoutMod.prototype.addSetting = function(id, type, callback) {
+	InfernoShoutMod.prototype.addSetting = function(id, type, html, callback) {
 		this.settings || (this.settings = {});
+
+		if ($.isFunction(html)) {
+			callback = html;
+		} else {
+			$('#infernoshoutmod_tab_content_settings > #content_box').append(arg3);
+		}
 
 		this.settings[id] = { 'type': type, 'callback': callback };
 	};
 
 	var InfernoShoutModDbLoad = function(mod, db) {
 		var ParseSetting = function(id, info, $elem) {
-			var transaction = db.transaction(['settings'], 'readwrite');
-
-			var store = transaction.objectStore('settings');
-
 			var parser = false;
 
 			if (info.type in settingsParsers) {
@@ -50,26 +52,20 @@ define(['./mod', 'text!./settings/settings.html', './settings/frontend'], functi
 
 			var value = parser($elem);
 
-			var req = store.put({ 'setting': id, 'value': value});
+			var store = db.store('settings');
 
-			req.onsuccess = function(e) {
+			store.put({ 'setting': id, 'value': value}, function(err, res) {
 				info.callback(value);
-			};
+			});
 		};
 
 		var LoadSetting = function(id, setting) {
 			var $elem = $('#infernoshoutmod-setting-' + id);
 
-			var settings = db.transaction(['settings'], 'readonly');
+			var store = db.store('settings');
 
-			var store = settings.objectStore('settings');
-
-			var get = store.get(id);
-
-			get.onsuccess = function(e) {
-				var result = e.target.result
-
-				if (result) {
+			store.get(id, function(err, res) {
+				if (res) {
 					var populator = false;
 
 					if (setting.type in valuePopulators) {
@@ -84,22 +80,16 @@ define(['./mod', 'text!./settings/settings.html', './settings/frontend'], functi
 						return;
 					}
 
-					populator($elem, result.value);
+					populator($elem, res.value);
 
-					setting.callback(result.value);
+					setting.callback(res.value);
 				}
 
 				// We can also trigger this via .trigger('change'), so it's the best universal method
 				$elem.change(function() {
 					ParseSetting(id, setting, $(this));
 				});
-			};
-
-			get.onerror = function(e) {
-				$elem.change(function() {
-					ParseSetting(id, setting, $(this));
-				});
-			};
+			});
 		};
 
 		var initializedSettings = [];
@@ -129,23 +119,19 @@ define(['./mod', 'text!./settings/settings.html', './settings/frontend'], functi
 		mod.addStaticTab('settings', 'InfernoShoutMod', settingsHtml);
 		settingsJs.init(mod);
 
-		var open = indexedDB.open('infernoshoutmod', 1);
-
-		open.onupgradeneeded = function(e) {
-			var db = e.target.result;
-
-			if (!db.objectStoreNames.contains("settings")) {
-				db.createObjectStore("settings", { keyPath: 'setting' });
+		idb.open('infernoshoutmod', 1, {
+			upgrade : function(db) {
+				if (!db.objectStoreNames.contains("settings")) {
+					db.createObjectStore("settings", { keyPath: 'setting' });
+				}
+			},
+			success : function(db) {
+				InfernoShoutModDbLoad(mod, db);
+			},
+			error : function(error) {
+				console.log('[InfernoShoutMod] Unable to open settings db.');
 			}
-		};
-
-		open.onsuccess = function(e) {
-			InfernoShoutModDbLoad(mod, e.target.result);
-		};
-
-		open.onerror = function(e) {
-			console.log('[InfernoShoutMod] Unable to open settings db.');
-		};
+		});
 
 		InfernoShoutbox.initialIdleTimeLimit = InfernoShoutbox.idletimelimit;
 
