@@ -1,6 +1,6 @@
 // Username History Plugin
 // Based off code by Major and Klepto
-define(['htmlparser', 'soupselect'], function(HtmlParser, SoupSelect) {
+define(['htmlparser', 'soupselect', 'vbutil'], function(HtmlParser, SoupSelect, vbutil) {
 	var UsernameHistoryPlugin = function(mod) {
 		var FontWeight = {
 			NORMAL: {},
@@ -69,44 +69,33 @@ define(['htmlparser', 'soupselect'], function(HtmlParser, SoupSelect) {
 
 				loadingUsernames.push(id);
 
-				$.get("/member.php?u=" + id, function(data) {
-					var usernames = "", width = NAME_LIST_PREFIX_WIDTH;
+				vbutil.getUsernameHistory(id, function(err, usernames) {
+					var usernameHtml = '', width = NAME_LIST_PREFIX_WIDTH, i;
 
-					var handler = new HtmlParser.HtmlBuilder(function(err, dom) {
-						if (err) {
-							console.log(err);
-						} else {
-							var rows = SoupSelect.select(dom, '.historyblock tr');
-
-							rows.slice(1).forEach(function(row) {
-								var username = row.children[1].children[0].data, usernameWidth = username.width();
-								if (usernameWidth >= width) {
-									width = usernameWidth;
-								}
-								usernames += "<li>" + username + "</li>";
-							});
-
-							width = (usernames != "" ? NO_PREVIOUS_NAMES_WIDTH : width) + 5;
-							tab.width(width);
-
-							usernames = !usernames ? "<li>No previous names.</li>" : NAME_LIST_PREFIX + usernames;
-							cachedUsernames[id] = new User(width, usernames);
-
-							if (loading == id) {
-								tab.html(usernames);
-							}
-
-							for (var i = 0; i < loadingUsernames.length; i++) {
-								if (loadingUsernames[i] == id) {
-									delete loadingUsernames[i];
-									break;
-								}
-							}
+					for (i = 0; i < usernames.length; i++) {
+						var username = usernames[i], usernameWidth = username.width();
+						if (usernameWidth >= width) {
+							width = usernameWidth;
 						}
-					});
+						usernameHtml += '<li>' + username + '</li>';
+					}
 
-					var parser = new HtmlParser.Parser(handler);
-					parser.parseComplete(data);
+					width = (usernameHtml != "" ? NO_PREVIOUS_NAMES_WIDTH : width) + 5;
+					tab.width(width);
+
+					usernameHtml = !usernameHtml ? "<li>No previous names.</li>" : NAME_LIST_PREFIX + usernameHtml;
+					cachedUsernames[id] = new User(width, usernameHtml);
+
+					if (loading == id) {
+						tab.html(usernameHtml);
+					}
+
+					for (var i = 0; i < loadingUsernames.length; i++) {
+						if (loadingUsernames[i] == id) {
+							delete loadingUsernames[i];
+							break;
+						}
+					}
 				});
 			}
 		};
