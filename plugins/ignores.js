@@ -1,4 +1,4 @@
-define(['htmlparser', 'soupselect'], function(HtmlParser, SoupSelect) {
+define(['htmlparser', 'soupselect', 'vbutil'], function(HtmlParser, SoupSelect, vbutil) {
 	var ID_REGEXP = new RegExp(/pm_(\d+)/);
 
 	var IgnorePluginInit = function(mod) {
@@ -37,28 +37,12 @@ define(['htmlparser', 'soupselect'], function(HtmlParser, SoupSelect) {
 				return;
 			}
 
-			$.get('member.php?u=' + v, function(data) {
-				var handler = new HtmlParser.HtmlBuilder(function(err, dom) {
-					if (err) {
-						console.log(err);
-					} else {
-						var name = SoupSelect.select(dom, '.member_username');
-						name = name[0];
+			vbutil.findUserById(v, function(name) {
+				if (!name) {
+					return;
+				}
 
-						if (name.children.length < 1) {
-							return;
-						}
-
-						if (name.children[0].type == 'tag') {
-							updateName(v, name.children[1].children[0].data);
-						} else if (name.children[0].type == 'text') {
-							updateName(v, name.children[0].data);
-						}
-					}
-				});
-
-				var parser = new HtmlParser.Parser(handler);
-				parser.parseComplete(data);
+				updateName(v, name);
 			});
 		}
 

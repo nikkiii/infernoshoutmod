@@ -10,6 +10,6 @@ define(function() {
 
 	html += '<br /><h2>Plugins</h2>';
 	html += '<ul id="infernoshoutmod-setting-plugins"></ul>';
-	html += '<br /><br /><input id="infernoshoutmod-plugin-url" type="text" placeholder="Plugin URL" /> <input id="infernoshoutmod-plugin-add" type="button" value="Add" />'
+	html += '<br /><br /><input id="infernoshoutmod-plugin-url" type="text" placeholder="Plugin URL" /> <input id="infernoshoutmod-plugin-add" type="button" value="Add" />';
 	return html;
 });

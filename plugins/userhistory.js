@@ -64,8 +64,8 @@ define(['htmlparser', 'soupselect'], function(HtmlParser, SoupSelect) {
 				tab.html(user.html);
 			} else if (loadingUsernames.indexOf(id) == -1) {
 				loading = id;
-				tab.text("Loading...");
-				tab.width(55);
+				tab.html('<span style="font-size: 55px;"><i class="fa fa-spinner fa-spin"></i></span>');
+				tab.width(50);
 
 				loadingUsernames.push(id);
 

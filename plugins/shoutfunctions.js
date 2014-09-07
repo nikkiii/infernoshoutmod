@@ -4,6 +4,7 @@ define(function() {
 
 	var ShoutFunctionPlugin = function(mod) {
 		var hoverIndex = -1,
+			profileElement = $('<span class="profilelink"> <a href="#"><i class="fa fa-user"></i></a></span>'),
 			quoteElement = $('<span class="quote"> <a href="#"><i class="fa fa-comment-o"></i></a></span>'),
 			deleteElement = $('<span class="delete"> <a href="#"><i class="fa fa-trash"></i></a></span>'),
 			ignoreElement = $('<span class="ignore"> <a href="#"><i class="fa fa-ban"></i></a></span>');
@@ -13,7 +14,7 @@ define(function() {
 		mod.on('update_shouts', function(shouts) {
 			if (hoverIndex != -1) {
 				$('#shoutbox_frame > .smallfont:nth-child(' + hoverIndex + ')').each(function(index) {
-					$(this).append(quoteElement).append(this.ondblclick ? deleteElement : ignoreElement);
+					$(this).append(profileElement).append(quoteElement).append(this.ondblclick ? deleteElement : ignoreElement);
 				});
 			}
 		});
@@ -27,13 +28,32 @@ define(function() {
 
 			hoverIndex = $this.index() + 1;
 
-			$this.append(quoteElement).append(this.ondblclick ? deleteElement : ignoreElement);
+			$this.append(profileElement).append(quoteElement).append(this.ondblclick ? deleteElement : ignoreElement);
 		});
 
 		$('#shoutbox_frame').on('mouseleave', 'div.smallfont:not(:first)', function() {
-			$(this).children('.quote, .delete, .ignore').remove();
+			$(this).children('.profilelink, .quote, .delete, .ignore').remove();
 
 			hoverIndex = -1;
+		});
+
+		$('#shoutbox_frame').on('click', 'div.smallfont > .profilelink > a', function(e) {
+			e.preventDefault();
+
+			var $this = $(this);
+
+			var id = ID_REGEXP.exec($this.closest('.smallfont').html());
+
+			if (!id) {
+				return;
+			}
+
+			id = id[1];
+
+			var base = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
+
+			var w = window.open(base + '/member.php?u=' + id);
+			w.focus();
 		});
 
 		$('#shoutbox_frame').on('click', 'div.smallfont > .quote > a', function(e) {

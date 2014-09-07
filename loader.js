@@ -6,10 +6,12 @@ require.config({
 		jquery : 'http://cdn.probablyaserver.com/libs/jquery/2.1.1/jquery.min',
 		underscore : 'http://cdn.probablyaserver.com/libs/underscore/1.7.0/underscore.min',
 		fontawesome : 'http://cdn.probablyaserver.com/libs/font-awesome/4.2.0/css/font-awesome.min.css',
+		noty : 'http://cdn.probablyaserver.com/libs/jquery-noty/2.2.6/jquery.noty.packaged.min',
 		minivents : 'lib/minivents',
 		htmlparser : 'lib/htmlparser',
 		soupselect : 'lib/soupselect',
-		idb : 'lib/idb'
+		idb : 'lib/idb',
+		vbutil : 'lib/vbutil'
 	}
 });
 
@@ -34,6 +36,7 @@ var plugins = [
 	'plugins/noshadow',
 	'plugins/userhistory',
 	'plugins/shortcuts',
+	'plugins/simplerep',
 	'plugins/customloader' // Load custom plugins last
 ];
 

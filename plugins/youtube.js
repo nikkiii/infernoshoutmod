@@ -22,7 +22,7 @@ define(['../modules/util'], function(Util) {
 				var queryString = url.substring(url.indexOf('?') + 1);
 
 				if (queryString.indexOf('#') != -1) {
-					queryString = queryString.substirng(0, queryString.indexOf('#'));
+					queryString = queryString.substring(0, queryString.indexOf('#'));
 				}
 
 				var parts = Util.parseQueryString(queryString);
