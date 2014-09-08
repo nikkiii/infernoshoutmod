@@ -4,6 +4,7 @@ define(function() {
 	html += '<label><input id="infernoshoutmod-setting-idle" type="checkbox" checked="checked" /> Allow Idle Timeout</label><br />';
 	html += '<label><input id="infernoshoutmod-setting-effects" type="checkbox" /> Allow Username Effects</label><br />';
 	html += '<label><input id="infernoshoutmod-setting-promptdelete" type="checkbox" checked="checked" /> Prompt before deleting shouts</label><br />';
+	html += '<label><input id="infernoshoutmod-setting-quote-bbcode" type="checkbox" checked="checked" /> Quote bbcode and smilies</label><br />';
 
 	html += '<br /><h2>Ignored Users</h2>';
 	html += '<ul id="infernoshoutmod-setting-ignored-users"></ul>';

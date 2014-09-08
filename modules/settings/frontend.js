@@ -22,11 +22,10 @@ define(function() {
 			});
 			$(document).on('click', '#infernoshoutmod-ignore-remove', function(e) {
 				e.preventDefault();
+
 				var $elem = $(this).parent();
 				$elem.remove();
-				var user = $(this).parent().children('a:first').text();
 
-				mod.handleCommand('unignore ' + user);
 				$('#infernoshoutmod-setting-ignored-users').trigger('change');
 			});
 		}

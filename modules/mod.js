@@ -1,4 +1,9 @@
 define(['minivents'], function(Events) {
+	// Helper used when loading the userid
+	$.expr[':'].vbInitScript = function(obj, index, meta, stack){
+		return !obj.src && obj.innerHTML.indexOf('BBURL') !== -1;
+	};
+
 	function InfernoShoutMod() {
 		this.commands = {};
 		this.userId = -1;
@@ -106,14 +111,19 @@ define(['minivents'], function(Events) {
 			return false;
 		};
 
-		// Load some information
-		$.get('infernoshout.php?do=detach', function(res) {
-			var match = /var LOGGEDIN = (\d+) > 0 \? true : false;/.exec(res);
+		var $initScript = $('head > script:vbInitScript');
+
+		if ($initScript.length > 0) {
+			var initScriptData = $initScript.html();
+
+			var match = /var LOGGEDIN = (\d+) > 0 \? true : false;/.exec(initScriptData);
 
 			if (match) {
 				self.userId = parseInt(match[1]);
 			}
-		});
+
+			self.username = $(".welcomelink a").text();
+		}
 	};
 
 	InfernoShoutMod.prototype.onPluginLoad = function(plugin) {

@@ -1,8 +1,7 @@
-define(['htmlparser', 'soupselect', 'vbutil'], function(HtmlParser, SoupSelect, vbutil) {
-	var ID_REGEXP = new RegExp(/pm_(\d+)/);
-
+define(['htmlparser', 'soupselect', 'vbutil', 'noty'], function(HtmlParser, SoupSelect, vbutil) {
 	var IgnorePluginInit = function(mod) {
-		var ignores = [];
+		var ignores = [],
+			ignoreNames = [];
 
 		$.expr[':'].isShoutUser = function(obj, index, meta, stack){
 			obj = $('a:first', obj).get(0);
@@ -11,17 +10,39 @@ define(['htmlparser', 'soupselect', 'vbutil'], function(HtmlParser, SoupSelect, 
 				return;
 			}
 
-			var matches = ID_REGEXP.exec(new String(obj.onclick));
+			var matches = /pm_(\d+)/.exec(new String(obj.onclick));
 
 			return parseInt(matches[1]) == parseInt(meta[3]);
 		};
 
 		$.expr[':'].ignoredUser = function(obj, index, meta, stack){
-			var html = $(obj).html();
+			var $obj = $(obj),
+				html = $obj.html();
 
-			var matches = ID_REGEXP.exec(html);
+			var matches = /pm_(\d+)/.exec(html);
 
-			return matches && ignores.indexOf(parseInt(matches[1])) !== -1;
+			if (matches && ignores.indexOf(parseInt(matches[1])) !== -1) {
+				return true;
+			}
+
+			// Handles /me and prune, ban, silence notifications
+			if (PHP.trim(html)[0] == '*') {
+				var $span = $obj.children('span, font');
+
+				if ($span.length > 0) {
+					return ignoreNames.indexOf($span.text()) !== -1;
+				}
+
+				html = html.substring(1);
+
+				for (i = 0; i < ignoreNames.length; i++) {
+					if (html.indexOf(ignoreNames[i]) == 0) {
+						return true;
+					}
+				}
+			}
+
+			return false;
 		};
 
 		var nameCache = {};
@@ -29,6 +50,10 @@ define(['htmlparser', 'soupselect', 'vbutil'], function(HtmlParser, SoupSelect, 
 		function updateName(v, name) {
 			$('#ignore-' + v + ' > a:first').text(name);
 			nameCache[v] = name;
+
+			if (ignoreNames.indexOf(name) == -1) {
+				ignoreNames.push(name);
+			}
 		}
 
 		function refreshName(v) {
@@ -43,6 +68,44 @@ define(['htmlparser', 'soupselect', 'vbutil'], function(HtmlParser, SoupSelect, 
 				}
 
 				updateName(v, name);
+			});
+		}
+
+		function getUserByName(name, callback) {
+			if (name[0] == '#') {
+				return parseInt(name.substring(1));
+			}
+
+			var found = false;
+
+			$('#shoutbox_frame > .smallfont').each(function(index) {
+				var $a = $(this).children('a:first');
+
+				if ($a.length < 1) {
+					return;
+				}
+
+				if (name.toLowerCase() == $a.text().toLowerCase()) {
+					var id = /pm_(\d+)/.exec(new String($a.get(0).onclick));
+
+					if (id) {
+						found = true;
+						callback(parseInt(id[1]), $a.text());
+						return false;
+					}
+				}
+			});
+
+			if (found) {
+				return;
+			}
+
+			vbutil.findUser(name, function(id, name) {
+				if (id != -1) {
+					callback(id, name);
+				} else {
+					callback(-1, '');
+				}
 			});
 		}
 
@@ -90,40 +153,54 @@ define(['htmlparser', 'soupselect', 'vbutil'], function(HtmlParser, SoupSelect, 
 		mod.registerCommand('ignore', function(cmd, args) {
 			var user = args.join(' ');
 
-			if (!isNaN(user)) {
-				user = parseInt(user);
+			getUserByName(user, function(id, name) {
+				if (id == -1) {
+					noty({ text : 'Unable to find user ' + user, type : 'error', timeout : 5000 });
+					return;
+				}
 
-				if (user == mod.userId) {
+				if (id == mod.userId) {
 					alert('You cannot ignore yourself.');
 					return;
 				}
 
-				if (ignores.indexOf(user) !== -1) {
+				if (ignores.indexOf(id) !== -1) {
 					return;
 				}
 
-				ignores.push(user);
+				ignores.push(id);
 
-				appendIgnoredUser(user, true);
-			}
+				appendIgnoredUser(id, true);
+			});
 		});
 
 		mod.registerCommand('unignore', function(cmd, args) {
 			var user = args.join(' ');
 
-			if (!isNaN(user)) {
-				var idx = ignores.indexOf(parseInt(user));
+			getUserByName(user, function(id, name) {
+				if (id == -1) {
+					noty({ text : 'Unable to find user ' + user, type : 'error', timeout : 5000 });
+					return;
+				}
+
+				var idx = ignores.indexOf(id);
 
 				if (idx !== -1) {
 					var $elem = $('#infernoshoutmod-setting-ignored-users');
 
-					$elem.children('#ignore-' + user).remove();
+					$elem.children('#ignore-' + id).remove();
 
 					$elem.trigger('change');
 
 					delete ignores[idx];
+
+					var nameIdx = ignoreNames.indexOf(nameCache[id]);
+
+					if (nameIdx != -1) {
+						delete ignoreNames[idx];
+					}
 				}
-			}
+			});
 		});
 
 		mod.on('update_shouts', function(ctx, shouts) {

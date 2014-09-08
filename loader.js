@@ -37,6 +37,7 @@ var plugins = [
 	'plugins/userhistory',
 	'plugins/shortcuts',
 	'plugins/simplerep',
+	'plugins/emotebar',
 	'plugins/customloader' // Load custom plugins last
 ];
 

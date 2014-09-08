@@ -1,4 +1,4 @@
-define(function() {
+define(['vbutil'], function(vbutil) {
 	var ID_REGEXP = new RegExp(/pm_(\d+)/),
 		shoutIdRegex = new RegExp(/edit_shout\((\d+)\)/);
 
@@ -56,10 +56,41 @@ define(function() {
 			w.focus();
 		});
 
+		var smilies = false;
+
+		vbutil.getSmileyList(function(list) {
+			smilies = list;
+		}, true);
+
+		var includeBBCode = true;
+
+		mod.addSetting('quote-bbcode', 'checkbox', function(res) {
+			includeBBCode = res;
+		});
+
 		$('#shoutbox_frame').on('click', 'div.smallfont > .quote > a', function(e) {
 			e.preventDefault();
 
-			InfernoShoutbox.editor.value = PHP.trim($(this).closest('.smallfont').text());
+			var $elem = $(this).closest('.smallfont');
+
+			if (includeBBCode) {
+				$elem = $elem.clone();
+
+				var $time = $elem.children('.time');
+
+				// Get rid of those pesky mod buttons
+				$time.prevAll('a').remove();
+
+				$time.replaceWith($time.text());
+
+				// Replace the name with text
+				var $name = $elem.children('a:first');
+				$name.replaceWith($name.text());
+
+				$elem.children('.profilelink, .quote, .delete, .ignore').remove();
+			}
+
+			InfernoShoutbox.editor.value = PHP.trim(includeBBCode ? vbutil.htmlToBBCode($elem, smilies) : $elem.text());
 		});
 
 		$('#shoutbox_frame').on('click', 'div.smallfont > .delete > a', function(e) {

@@ -49,11 +49,11 @@ define(['htmlparser', 'soupselect', 'vbutil', 'noty'], function(HtmlParser, Soup
 				return;
 			}
 
-			var comment = args.length > 1 ? args[1] : 'Reputation from InfernoShoutMod';
+			var user = args.shift(),
+				comment = args.length > 1 ? args.join(' ') : 'Reputation from InfernoShoutMod',
+				neg = cmd == 'neg' ? true : false;
 
-			var neg = cmd == 'neg' ? true : false;
-
-			vbutil.findUser(args[0], function(userId, name) {
+			vbutil.findUser(user, function(userId, name) {
 				if (userId != -1) {
 					findPosts(userId, function(posts) {
 						recursiveReputation(posts, comment, neg ? 'neg' : 'pos', function(err) {
@@ -65,7 +65,7 @@ define(['htmlparser', 'soupselect', 'vbutil', 'noty'], function(HtmlParser, Soup
 						});
 					});
 				} else {
-					noty({ text : 'Unable to find user ' + args[0], type : 'error', timeout : 5000 });
+					noty({ text : 'Unable to find user ' + user, type : 'error', timeout : 5000 });
 				}
 			});
 		};
