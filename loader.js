@@ -12,20 +12,14 @@ require.config({
 		soupselect : 'lib/soupselect',
 		idb : 'lib/idb',
 		vbutil : 'lib/vbutil'
+	},
+	shim : {
+		noty : {
+			deps : ['jquery'],
+			exports : 'noty'
+		}
 	}
 });
-
-var deps = [
-	'jquery',
-	'css!fontawesome'
-];
-
-var modules = [
-	'modules/mod',
-	'modules/commands',
-	'modules/tabs',
-	'modules/settings'
-];
 
 var plugins = [
 	'plugins/groupchanger',
@@ -41,8 +35,8 @@ var plugins = [
 	'plugins/customloader' // Load custom plugins last
 ];
 
-require(deps, function($) {
-	require(modules, function(InfernoShoutMod) {
+require(['jquery', 'css!fontawesome'], function($) {
+	require(['modules/mod', 'modules/commands', 'modules/tabs', 'modules/settings'], function(InfernoShoutMod) {
 		console.log('[InfernoShoutMod] Initial loading done.');
 
 		var mod = new InfernoShoutMod();
@@ -60,7 +54,19 @@ require(deps, function($) {
 			}
 		}
 
-		require(plugins, function() {
+		require([
+			'plugins/groupchanger',
+			'plugins/ignores',
+			'plugins/shoutfunctions',
+			'plugins/shoutreplace',
+			'plugins/youtube',
+			'plugins/noshadow',
+			'plugins/userhistory',
+			'plugins/shortcuts',
+			'plugins/simplerep',
+			'plugins/emotebar',
+			'plugins/customloader' // Load custom plugins last
+		], function() {
 			var i;
 			for(i = 0; i < arguments.length; i++) {
 				arguments[i].init(mod);

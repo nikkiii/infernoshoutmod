@@ -3,6 +3,10 @@ define(['module'], function (module) {
 
 	return {
 		load : function(name, req, onload, config) {
+			if (config.isBuild) {
+				onload();
+				return;
+			}
 			var link = document.createElement("link");
 			link.type = "text/css";
 			link.rel = "stylesheet";
