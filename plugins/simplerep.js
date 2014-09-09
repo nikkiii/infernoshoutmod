@@ -55,6 +55,12 @@ define(['htmlparser', 'soupselect', 'vbutil', 'noty'], function(HtmlParser, Soup
 
 			vbutil.findUser(user, function(userId, name) {
 				if (userId != -1) {
+					var confirmation = confirm('Are you sure you wish to ' + (neg ? 'deduct reputation from' : 'add reputation to') + ' ' + name + '?');
+
+					if (!confirmation) {
+						return;
+					}
+
 					findPosts(userId, function(posts) {
 						recursiveReputation(posts, comment, neg ? 'neg' : 'pos', function(err) {
 							if (!err) {
