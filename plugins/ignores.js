@@ -71,44 +71,6 @@ define(['htmlparser', 'soupselect', 'vbutil', 'noty'], function(HtmlParser, Soup
 			});
 		}
 
-		function getUserByName(name, callback) {
-			if (name[0] == '#') {
-				return parseInt(name.substring(1));
-			}
-
-			var found = false;
-
-			$('#shoutbox_frame > .smallfont').each(function(index) {
-				var $a = $(this).children('a:first');
-
-				if ($a.length < 1) {
-					return;
-				}
-
-				if (name.toLowerCase() == $a.text().toLowerCase()) {
-					var id = /pm_(\d+)/.exec(new String($a.get(0).onclick));
-
-					if (id) {
-						found = true;
-						callback(parseInt(id[1]), $a.text());
-						return false;
-					}
-				}
-			});
-
-			if (found) {
-				return;
-			}
-
-			vbutil.findUser(name, function(id, name) {
-				if (id != -1) {
-					callback(id, name);
-				} else {
-					callback(-1, '');
-				}
-			});
-		}
-
 		function appendIgnoredUser(userid, trigger) {
 			var $user = $('#shoutbox_frame').children('.smallfont:isShoutUser(' + userid + ')');
 
@@ -153,14 +115,14 @@ define(['htmlparser', 'soupselect', 'vbutil', 'noty'], function(HtmlParser, Soup
 		mod.registerCommand('ignore', function(cmd, args) {
 			var user = args.join(' ');
 
-			getUserByName(user, function(id, name) {
+			vbutil.findUser(user, function(id, name) {
 				if (id == -1) {
 					noty({ text : 'Unable to find user ' + user, type : 'error', timeout : 5000 });
 					return;
 				}
 
 				if (id == mod.userId) {
-					alert('You cannot ignore yourself.');
+					noty({ text : 'You cannot ignore yourself.', type : 'error', timeout : 5000 });
 					return;
 				}
 
@@ -171,13 +133,15 @@ define(['htmlparser', 'soupselect', 'vbutil', 'noty'], function(HtmlParser, Soup
 				ignores.push(id);
 
 				appendIgnoredUser(id, true);
+
+				noty({ text : 'Successfully ignored ' + name + '.', type : 'success', timeout : 5000 });
 			});
 		});
 
 		mod.registerCommand('unignore', function(cmd, args) {
 			var user = args.join(' ');
 
-			getUserByName(user, function(id, name) {
+			vbutil.findUser(user, function(id, name) {
 				if (id == -1) {
 					noty({ text : 'Unable to find user ' + user, type : 'error', timeout : 5000 });
 					return;
@@ -199,6 +163,8 @@ define(['htmlparser', 'soupselect', 'vbutil', 'noty'], function(HtmlParser, Soup
 					if (nameIdx != -1) {
 						delete ignoreNames[idx];
 					}
+
+					noty({ text : 'Successfully removed ' + name + ' from ignore list.', type : 'success', timeout : 5000 });
 				}
 			});
 		});

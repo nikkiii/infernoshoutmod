@@ -1,4 +1,4 @@
-define(function() {
+define(['vbutil'], function(vbutil) {
 	var GroupChangerPlugin = function(mod) {
 		var usergroups = {
 			'member': 2,
@@ -20,7 +20,7 @@ define(function() {
 
 		for (var x in usergroups) {
 			mod.registerCommand(x, function(command, args) {
-				InfernoShoutbox.setUserGroup(usergroups[command]);
+				vbutil.setUserGroup(usergroups[command]);
 			});
 		}
 
