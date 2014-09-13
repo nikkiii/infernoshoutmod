@@ -47,13 +47,21 @@ define(['minivents'], function(Events) {
 		};
 
 		InfernoShoutbox.update_shouts = function(shouts) {
-			this.shoutframe.innerHTML = shouts;
+			var error = shouts.indexOf('The server is too busy at the moment. Please try again later.') !== -1;
+
+			if (error) {
+				this.shoutframe.innerHTML = "The server is too busy at the moment. Please try again later.";
+			} else {
+				this.shoutframe.innerHTML = shouts;
+			}
 
 			if (this.newestbottom && this.shoutframe.scrollTop < this.shoutframe.scrollHeight) {
 				this.shoutframe.scrollTop = this.shoutframe.scrollHeight;
 			}
 
-			self.emit('update_shouts', shouts);
+			if (!error) {
+				self.emit('update_shouts', shouts);
+			}
 		};
 
 		// BETTER pming.
