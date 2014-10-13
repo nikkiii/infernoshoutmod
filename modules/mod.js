@@ -67,7 +67,9 @@ define(['minivents'], function(Events) {
 				this.shoutframe.scrollTop = this.shoutframe.scrollHeight;
 			}
 
-			self.emit('update_shouts_post');
+			if (!error) {
+				self.emit('update_shouts_post');
+			}
 		};
 
 		// BETTER pming.
