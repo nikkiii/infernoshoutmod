@@ -45,6 +45,7 @@ define(function() {
 	};
 
 	return {
+		id : 'shortcuts',
 		init : ShortcutPlugin
 	};
 });

@@ -105,6 +105,7 @@ define(['htmlparser', 'soupselect', 'vbutil'], function(HtmlParser, SoupSelect, 
 	};
 
 	return {
-		init: UsernameHistoryPlugin
+		id : 'userhistory',
+		init : UsernameHistoryPlugin
 	};
 });

@@ -8,6 +8,7 @@ define(function() {
 	};
 
 	return {
+		id : 'formatting',
 		init : TextFormattingPlugin
 	};
 });

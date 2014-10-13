@@ -175,6 +175,7 @@ define(['htmlparser', 'soupselect', 'vbutil', 'noty'], function(HtmlParser, Soup
 	};
 
 	return {
+		id : 'ignores',
 		init : IgnorePluginInit
 	};
 });

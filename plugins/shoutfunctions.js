@@ -144,6 +144,7 @@ define(['vbutil'], function(vbutil) {
 	};
 
 	return {
+		id : 'shoutfunctions',
 		init: ShoutFunctionPlugin
 	};
 });

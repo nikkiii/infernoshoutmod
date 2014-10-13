@@ -89,6 +89,7 @@ define(function() {
 	};
 
 	return {
+		id : 'shoutreplace',
 		init: ShoutReplacePlugin
 	};
 });

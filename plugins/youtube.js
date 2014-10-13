@@ -76,6 +76,7 @@ define(['../modules/util'], function(Util) {
 	};
 
 	return {
-		init: YoutubePlugin
+		id : 'youtube',
+		init : YoutubePlugin
 	}
 });

@@ -52,16 +52,22 @@ define(['minivents'], function(Events) {
 			if (error) {
 				this.shoutframe.innerHTML = "The server is too busy at the moment. Please try again later.";
 			} else {
-				this.shoutframe.innerHTML = shouts;
+				var event = new ShoutUpdateEvent(shouts);
+
+				self.emit('update_shouts', event);
+
+				if (!event.shoutHtml) {
+					return;
+				}
+
+				this.shoutframe.innerHTML = event.shoutHtml;
 			}
 
 			if (this.newestbottom && this.shoutframe.scrollTop < this.shoutframe.scrollHeight) {
 				this.shoutframe.scrollTop = this.shoutframe.scrollHeight;
 			}
 
-			if (!error) {
-				self.emit('update_shouts', shouts);
-			}
+			self.emit('update_shouts_post');
 		};
 
 		// BETTER pming.
@@ -142,6 +148,10 @@ define(['minivents'], function(Events) {
 
 	function MessageEvent(message) {
 		this.message = message;
+	}
+
+	function ShoutUpdateEvent(shoutHtml) {
+		this.shoutHtml = shoutHtml;
 	}
 
 	return InfernoShoutMod;

@@ -6,18 +6,19 @@ define(function() {
 			enableEffects = val;
 		});
 
-		mod.on('update_shouts', function(shouts) {
+		mod.on('update_shouts_post', function(ctx) {
 			if (!enableEffects) {
-				$('span', InfernoShoutbox.shoutframe).each(function(index) {
-					if ($(this).css('text-shadow')) {
-						$(this).css('text-shadow', '');
-					}
+				$('span', InfernoShoutbox.shoutframe).filter(function() {
+					return typeof this.style['text-shadow'] !== "undefined";
+				}).each(function(index) {
+					$(this).css('text-shadow', '');
 				});
 			}
 		});
 	};
 
 	return {
+		id : 'noeffects',
 		init: NoShadowPlugin
 	};
 });

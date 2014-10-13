@@ -21,20 +21,6 @@ require.config({
 	}
 });
 
-var plugins = [
-	'plugins/groupchanger',
-	'plugins/ignores',
-	'plugins/shoutfunctions',
-	'plugins/shoutreplace',
-	'plugins/youtube',
-	'plugins/noshadow',
-	'plugins/userhistory',
-	'plugins/shortcuts',
-	'plugins/simplerep',
-	'plugins/emotebar',
-	'plugins/customloader' // Load custom plugins last
-];
-
 require(['jquery', 'css!fontawesome'], function($) {
 	require(['modules/mod', 'modules/commands', 'modules/tabs', 'modules/settings'], function(InfernoShoutMod) {
 		console.log('[InfernoShoutMod] Initial loading done.');
@@ -65,12 +51,18 @@ require(['jquery', 'css!fontawesome'], function($) {
 			'plugins/shortcuts',
 			'plugins/simplerep',
 			'plugins/emotebar',
+			'plugins/smilies',
 			'plugins/customloader' // Load custom plugins last
 		], function() {
 			var i;
 			for(i = 0; i < arguments.length; i++) {
+				var plugin = arguments[i];
+
 				arguments[i].init(mod);
-				mod.onPluginLoad(plugins[i]);
+
+				if (typeof plugin['id'] !== undefined) {
+					mod.onPluginLoad(plugin['id']);
+				}
 			}
 			console.log('[InfernoShoutMod] ' + arguments.length + ' plugins loaded.');
 		});

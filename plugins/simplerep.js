@@ -50,7 +50,7 @@ define(['htmlparser', 'soupselect', 'vbutil', 'noty'], function(HtmlParser, Soup
 			}
 
 			var user = args.shift(),
-				comment = args.length > 1 ? args.join(' ') : 'Reputation from InfernoShoutMod',
+				comment = args.length > 0 ? args.join(' ') : 'Reputation from InfernoShoutMod',
 				neg = cmd == 'neg' ? true : false;
 
 			vbutil.findUser(user, function(userId, name) {
@@ -81,6 +81,7 @@ define(['htmlparser', 'soupselect', 'vbutil', 'noty'], function(HtmlParser, Soup
 	};
 
 	return {
+		id : 'simplerep',
 		init : SimpleRepPlugin
 	};
 });

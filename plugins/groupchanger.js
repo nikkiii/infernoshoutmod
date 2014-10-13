@@ -44,6 +44,7 @@ define(['vbutil'], function(vbutil) {
 	};
 
 	return {
+		id : 'groupchanger',
 		init: GroupChangerPlugin
 	};
 });

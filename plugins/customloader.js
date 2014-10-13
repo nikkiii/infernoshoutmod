@@ -31,15 +31,22 @@ define(function() {
 				}
 				var i;
 				for (i = 0; i < arguments.length; i++) {
+					var plugin = arguments[i];
+
 					arguments[i].init(mod);
 
-					mod.onPluginLoad(val[i]);
+					if (typeof plugin['id'] !== undefined) {
+						mod.onPluginLoad(plugin['id']);
+					} else {
+						mod.onPluginLoad(val[i]);
+					}
 				}
 			});
 		});
 	};
 
 	return {
+		id : 'customloader',
 		init : CustomPluginLoader
 	};
 });

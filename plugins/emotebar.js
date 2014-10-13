@@ -8,6 +8,7 @@ define(['htmlparser', 'soupselect'],
 		var $$ = SoupSelect.select;
 
 		return {
+			id : 'emotebar',
 			init: function(mod) {
 				var buttonsParent = $('input[type="button"][value="Shout"]').parent(),
 					barParent = buttonsParent.closest('form');
