@@ -75,20 +75,19 @@ define(['../modules/util'], function(Util) {
 		});
 	}
 
-	// An array of handlers to search.
-
-	var handlers = [
-		{
-			urls : [ 'youtube.com', 'youtu.be' ],
-			handler : YoutubeHandler
-		},
-		{
-			urls : [ 'twitch.tv' ],
-			handler : TwitchHandler
-		}
-	];
-
 	var MediaInfoPlugin = function(mod) {
+		// An array of handlers to search.
+		var handlers = [
+			{
+				urls : [ 'youtube.com', 'youtu.be' ],
+				handler : YoutubeHandler
+			},
+			{
+				urls : [ 'twitch.tv' ],
+				handler : TwitchHandler
+			}
+		];
+
 		// Register a method to allow plugins to register a media/link info handler.
 		mod.registerMediaInfoHandler = function(options) {
 			if (!options.urls || !options.handler) {
@@ -129,6 +128,7 @@ define(['../modules/util'], function(Util) {
 					for (var l = 0; l < handlers.length; l++) {
 						if (url.indexOf(data.urls[l]) !== -1) {
 							data.handler(url, callback);
+							handled = true;
 							break outer_loop;
 						}
 					}
