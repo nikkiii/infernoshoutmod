@@ -45,13 +45,14 @@ require(['jquery', 'css!fontawesome'], function($) {
 			'plugins/ignores',
 			'plugins/shoutfunctions',
 			'plugins/shoutreplace',
-			'plugins/youtube',
+			'plugins/mediainfo',
 			'plugins/noshadow',
 			'plugins/userhistory',
 			'plugins/shortcuts',
 			'plugins/simplerep',
 			'plugins/emotebar',
 			'plugins/smilies',
+			'plugins/textformatting',
 			'plugins/customloader' // Load custom plugins last
 		], function() {
 			var i;

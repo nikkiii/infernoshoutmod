@@ -11,7 +11,7 @@ define(['vbutil'], function(vbutil) {
 
 		var promptDelete = true;
 
-		mod.on('update_shouts', function(shouts) {
+		mod.on('update_shouts_post', function(shouts) {
 			if (hoverIndex != -1) {
 				$('#shoutbox_frame > .smallfont:nth-child(' + hoverIndex + ')').each(function(index) {
 					$(this).append(profileElement).append(quoteElement).append(this.ondblclick ? deleteElement : ignoreElement);
@@ -135,7 +135,7 @@ define(['vbutil'], function(vbutil) {
 				return;
 			}
 
-			mod.handleCommand('ignore ' + id);
+			mod.handleCommand('ignoreid ' + id);
 		});
 
 		mod.addSetting('promptdelete', 'checkbox', function(val) {

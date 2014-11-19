@@ -11,13 +11,15 @@ define(function() {
 			}
 			return out;
 		},
-		filterTitle: function(title) {
+		filterTitle: function(title, decapitalize) {
 			var replaced = title.replace(new RegExp("[\\(\\[][a-zA-Z ]+[\\)\\]]", "g"), ""); // |((L|l)yrics)
 			var parts = replaced.split(" ");
 
-			for (var i = 0; i < parts.length; i++) {
-				var part = parts[i];
-				parts[i] = part.charAt(0).toUpperCase() + part.substring(1).toLowerCase();
+			if (decapitalize) {
+				for (var i = 0; i < parts.length; i++) {
+					var part = parts[i];
+					parts[i] = part.charAt(0).toUpperCase() + part.substring(1).toLowerCase();
+				}
 			}
 
 			replaced = parts.join(" ");
