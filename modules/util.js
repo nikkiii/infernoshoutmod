@@ -24,6 +24,52 @@ define(function() {
 
 			replaced = parts.join(" ");
 			return replaced.trim();
+		},
+		parseURL : function(url) {
+			var parser = document.createElement('a'),
+				searchObject = {},
+				queries, split, i;
+
+			// Let the browser do the work
+			parser.href = url;
+
+			// Convert query string to object
+			queries = parser.search.replace(/^\?/, '').split('&');
+			for( i = 0; i < queries.length; i++ ) {
+				split = queries[i].split('=');
+				searchObject[split[0]] = split[1];
+			}
+
+			return {
+				protocol: parser.protocol,
+				host: parser.host,
+				hostname: parser.hostname,
+				port: parser.port,
+				pathname: parser.pathname,
+				queryString: parser.search,
+				queryObject: searchObject,
+				hash: parser.hash
+			};
+		},
+		secondsToHMS: function(time) {
+			// Minutes and seconds
+			var mins = ~~(time / 60);
+			var secs = time % 60;
+
+			// Hours, minutes and seconds
+			var hrs = ~~(time / 3600);
+			var mins = ~~((time % 3600) / 60);
+			var secs = time % 60;
+
+			// Output like "1:01" or "4:03:59" or "123:03:59"
+			ret = "";
+
+			if (hrs > 0)
+				ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
+
+			ret += "" + mins + ":" + (secs < 10 ? "0" : "");
+			ret += "" + secs;
+			return ret;
 		}
 	}
 });

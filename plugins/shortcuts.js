@@ -5,7 +5,7 @@ define(function() {
 		});
 
 		mod.registerCommand('m', function(cmd, args) {
-			InfernoShoutbox.postShout('http://www.rune-server.org/programming/website-development/projects/564248-infernoshoutmod.html');
+			InfernoShoutbox.postShout('[url=http://www.rune-server.org/programming/website-development/projects/564248-infernoshoutmod.html]InfernoShoutMod[/url]');
 		});
 
 		mod.registerCommand('prefix', function(cmd, args) {

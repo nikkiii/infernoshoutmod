@@ -2,31 +2,46 @@ define(['../modules/util'], function(Util) {
 	function YoutubeHandler(url, callback) {
 		var video = '';
 
-		if (url.indexOf('v=') != -1) {
-			// The best way to do it. Parse all query string variables, then get the "v" variable.
-			var queryString = url.substring(url.indexOf('?') + 1);
+		var info = Util.parseURL(url);
 
-			if (queryString.indexOf('#') != -1) {
-				queryString = queryString.substring(0, queryString.indexOf('#'));
-			}
-
-			var parts = Util.parseQueryString(queryString);
-
-			video = parts['v'];
-		} else if (url.indexOf('youtu.be') != -1) {
-			// This is messy, but without a parse url function it'll have to do.
-			video = url.substring(url.lastIndexOf('/') + 1);
-
-			if (video.indexOf('?') != -1) {
-				video = video.substring(0, video.indexOf('?'));
-			}
-			if (video.indexOf('#') != -1) {
-				video = video.substring(0, video.indexOf('#'));
-			}
+		if ('v' in info.queryObject) {
+			video = info.queryObject['v'];
+		} else if (info.host == 'youtu.be') {
+			video = info.pathname.substring(1);
 		}
 
 		if (video == '') {
 			return;
+		}
+
+		var startTime = false;
+
+		if ('t' in info.queryObject) {
+			startTime = info.queryObject['t'];
+		} else if (/t\=/.test(info.hash)) {
+			var hashInfo = Util.parseQueryString(info.hash.substring(1));
+
+			if ('t' in hashInfo) {
+				startTime = hashInfo['t'];
+			}
+		}
+
+		if (startTime) {
+			var match = /(\d+h)?(\d+m)?(\d+s)/.exec(startTime);
+
+			if (match && (match[1] || match[2] || match[3])) {
+				var h = match[1].replace(/h$/, ''), m = match[2].replace(/m$/, ''), s = match[3].replace(/s$/, '');
+
+				startTime = '';
+
+				if (h && h.length > 0) {
+					startTime = h + ':';
+				}
+
+				startTime += (m < 10 ? ('0' + m) : m) + ':' + (s < 10 ? ('0' + s) : s);
+			} else {
+				startTime = Util.secondsToHMS(startTime);
+			}
 		}
 
 		$.ajax({
@@ -41,10 +56,7 @@ define(['../modules/util'], function(Util) {
 					var length = parseInt(result['feed']['entry'][0]['media$group']['media$content'][0]['duration']);
 					var title = result['feed']['entry'][0]['title']['$t'];
 
-					var minutes = Math.floor(length / 60);
-					var seconds = length % 60;
-
-					callback(Util.filterTitle(title) + ' [' + minutes + ':' + (seconds < 10 ? ('0' + seconds) : seconds) + ']');
+					callback(Util.filterTitle(title) + ' [' + Util.secondsToHMS(length) + (startTime ? ', start: ' + startTime : '') + ']');
 				} else {
 					callback(false);
 				}
@@ -53,15 +65,23 @@ define(['../modules/util'], function(Util) {
 	}
 
 	function TwitchHandler(url, callback) {
-		var name = /^http(s?):\/\/www\.twitch\.tv\/(.*?)$/.exec(url);
+		var info = Util.parseURL(url);
 
-		if (!name || name.length < 1) {
+		var directoryMatch = /^\/directory\/game\/(.*?)$/.exec(info.pathname),
+			name;
+
+		if (/^\/[^\/]+$/.test(info.pathname)) {
+			name = info.pathname.substring(1);
+		} else if (directoryMatch) {
+			callback('Streams for ' + decodeURIComponent(directoryMatch[1]) + ' on Twitch');
+			return;
+		} else {
 			callback(false);
 			return;
 		}
 
 		$.ajax({
-			url: 'https://api.twitch.tv/kraken/channels/' + name[2],
+			url: 'https://api.twitch.tv/kraken/channels/' + name,
 			dataType: 'jsonp',
 			success: function(result) {
 				if (!('error' in result)) {
@@ -112,9 +132,9 @@ define(['../modules/util'], function(Util) {
 
 			url = url[0];
 
-			var callback = function(replacement) {
-				if (replacement) {
-					message = message.replace(url, '[url=' + url + ']' + replacement + '[/url]');
+			var callback = function(title) {
+				if (title) {
+					message = message.replace(url, '[url=' + url + ']' + title + '[/url]');
 				}
 				InfernoShoutbox.postShout(message);
 			};
