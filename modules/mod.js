@@ -6,6 +6,7 @@ define(['minivents'], function(Events) {
 
 	function InfernoShoutMod() {
 		this.commands = {};
+		this.plugins = [];
 		this.userId = -1;
 		this.events = new Events(this);
 	}
@@ -69,6 +70,15 @@ define(['minivents'], function(Events) {
 
 			if (!error) {
 				self.emit('update_shouts_post');
+			}
+		};
+
+		InfernoShoutbox.fetch_users_completed = function () {
+			ajax = InfernoShoutbox.fetchusers.ajax;
+			if (ajax.handler.readyState == 4 && ajax.handler.status == 200) {
+				document.getElementById("users").innerHTML = ajax.handler.responseText;
+
+				self.emit('users_update');
 			}
 		};
 
@@ -143,7 +153,6 @@ define(['minivents'], function(Events) {
 	};
 
 	InfernoShoutMod.prototype.onPluginLoad = function(plugin) {
-		this.plugins || (this.plugins = []);
 		this.plugins.push(plugin);
 		this.emit('pluginLoad', plugin);
 	};

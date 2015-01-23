@@ -8,6 +8,7 @@ define(['vbutil'], function(vbutil) {
 			'donator': 16,
 			'veteran': 22,
 			'designer': 30,
+			'affiliate' : 49,
 			'sotw': 54,
 			'programmer': 63,
 			'respected': 69,

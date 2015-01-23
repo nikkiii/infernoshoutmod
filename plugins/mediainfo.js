@@ -1,4 +1,4 @@
-define(['../modules/util'], function(Util) {
+define(['../lib/util'], function(Util) {
 	function YoutubeHandler(url, callback) {
 		var video = '';
 
@@ -95,6 +95,32 @@ define(['../modules/util'], function(Util) {
 		});
 	}
 
+	function SpotifyHandler(url, callback) {
+		var info = Util.parseURL(url);
+
+		var trackIdMatch = /^\/track\/([a-zA-Z0-9]+)/.exec(info.pathname),
+			name;
+
+		if (!trackIdMatch) {
+			callback(false);
+			return;
+		}
+
+		var trackId = trackIdMatch[1];
+
+		$.ajax({
+			url: 'https://api.spotify.com/v1/tracks/' + trackId,
+			dataType: 'json',
+			success: function(result) {
+				if (!('error' in result)) {
+					callback(Util.filterTitle(result.name) + ' on Spotify');
+				} else {
+					callback(false);
+				}
+			}
+		});
+	}
+
 	var MediaInfoPlugin = function(mod) {
 		// An array of handlers to search.
 		var handlers = [
@@ -105,6 +131,10 @@ define(['../modules/util'], function(Util) {
 			{
 				urls : [ 'twitch.tv' ],
 				handler : TwitchHandler
+			},
+			{
+				urls : [ 'open.spotify.com', 'play.spotify.com' ],
+				handler : SpotifyHandler
 			}
 		];
 
@@ -124,13 +154,13 @@ define(['../modules/util'], function(Util) {
 				return;
 			}
 
-			var url = /(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*))/.exec(message);
+			var url = /(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*))/i.exec(message);
 
 			if (!url || url.length < 1) {
 				return;
 			}
 
-			url = url[0];
+			url = url && url[0];
 
 			var callback = function(title) {
 				if (title) {

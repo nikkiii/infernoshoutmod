@@ -23,6 +23,10 @@ define(function() {
 		':coding:' : {
 			image : 'http://i.imgur.com/htuHhTi.gif',
 			alt : 'coding coding coding coding'
+		},
+		':weebly:' : {
+			image : 'http://i.imgur.com/LOOLsoS.png',
+			alt : 'weebly'
 		}
 	};
 
@@ -32,7 +36,7 @@ define(function() {
 		"<yun>": "\u10DA(\u0CA0\u76CA\u0CA0\u10DA)",
 		"<d>": "\u00AF\\(\u00B0_o)/\u00AF",
 		"<butterfly>": "\u01B8\u0335\u0321\u04DC\u0335\u0328\u0304\u01B7",
-		"<shrug>": "\u00AF\\\\_(\u30C4)_/\u00AF",
+		"<shrug>": "\u00AF\\_(\u30C4)_/\u00AF",
 		"<:3>": "(\u30FB\u03C9\u30FB\uFF40 )\uFEFF",
 		"<flip>": "(\u30CE\u0CA0\u76CA\u0CA0)\u30CE\u5F61\u253B\u2501\u253B",
 		"<unflip>": "\u252C\u2500\u2500\u252C\u25E1\uFF89(\u00B0 -\u00B0\uFF89)",
@@ -48,8 +52,20 @@ define(function() {
 		"<j>": "\u10DA(\u0CA0\u76CA\u0CA0\u10DA)"
 	};
 
+	if (!String.prototype.format) {
+		String.prototype.format = function() {
+			var args = arguments;
+			return this.replace(/{(\d+)}/g, function(match, number) {
+				return typeof args[number] != 'undefined'
+					? args[number]
+					: match
+					;
+			});
+		};
+	}
+
 	function generateImageTag(data) {
-		return '<img src="' + data.image + '" alt="' + data.alt + '" style="border: 0;" />';
+		return '<img src="{0}" alt="{1}" style="border:0;" />'.format(data.image, data.alt);
 	}
 
 	var SmileyPlugin = function(mod) {

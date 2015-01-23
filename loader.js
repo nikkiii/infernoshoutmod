@@ -11,7 +11,8 @@ require.config({
 		htmlparser : 'lib/htmlparser',
 		soupselect : 'lib/soupselect',
 		idb : 'lib/idb',
-		vbutil : 'lib/vbutil'
+		vbutil : 'lib/vbutil',
+		util : 'lib/util'
 	},
 	shim : {
 		noty : {
@@ -23,12 +24,12 @@ require.config({
 
 require(['jquery', 'css!fontawesome'], function($) {
 	require(['modules/mod', 'modules/commands', 'modules/tabs', 'modules/settings'], function(InfernoShoutMod) {
-		console.log('[InfernoShoutMod] Initial loading done.');
+		console.log('[InfernoShoutMod] Initial module loading done.');
 
 		var mod = new InfernoShoutMod();
 		mod.init();
 
-		console.log('[InfernoShoutMod] Initializing modules');
+		console.log('[InfernoShoutMod] Initializing modules...');
 
 		var args = Array.apply([], arguments);
 		args = args.slice(1);
@@ -39,6 +40,8 @@ require(['jquery', 'css!fontawesome'], function($) {
 				args[i].init(mod);
 			}
 		}
+
+		console.log('[InfernoShoutMod] Initialized ' + args.length + ' modules.');
 
 		require([
 			'plugins/groupchanger',
@@ -53,13 +56,15 @@ require(['jquery', 'css!fontawesome'], function($) {
 			'plugins/emotebar',
 			'plugins/smilies',
 			'plugins/textformatting',
+			'plugins/spotify',
+			'plugins/urban',
 			'plugins/customloader' // Load custom plugins last
 		], function() {
 			var i;
 			for(i = 0; i < arguments.length; i++) {
 				var plugin = arguments[i];
 
-				arguments[i].init(mod);
+				plugin.init(mod);
 
 				if (typeof plugin['id'] !== undefined) {
 					mod.onPluginLoad(plugin['id']);
