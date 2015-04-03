@@ -1,13 +1,18 @@
 var fs = require('fs'),
 	CommandHandler = require('./commands'),
 	Autolinker = require( 'autolinker' ),
-	bbcode = require('./bbcode');
+	bbcode = require('./bbcode'),
+	Auth = require('./auth'),
+	config = require('./config');
 
 var FixedQueue = require('./fixedqueue');
 
 function ISMShoutServer() {
 	this.history = FixedQueue(50);
 	this.commands = new CommandHandler(this);
+	this.auth = new Auth(config.auth.url, config.auth.user.userId);
+
+	this.auth.login(config.auth.user.username, config.auth.user.password);
 
 	this.groups = JSON.parse(fs.readFileSync('data/groups.json'));
 	this.banList = JSON.parse(fs.readFileSync('data/bans.json'));
@@ -30,10 +35,13 @@ ISMShoutServer.prototype.start = function() {
 
 		socket.emit('history', self.history);
 
+		// Initialize auth.
+		self.auth.wrap(socket);
+
 		var ident = false;
 
 		socket.on('ident', function(data) {
-			if (!validateObject(data, [ 'userId', 'username' ])) {
+			if (!validateObject(data, [ 'userId', 'username', 'token' ])) {
 				socket.close();
 				return;
 			}
@@ -42,6 +50,12 @@ ISMShoutServer.prototype.start = function() {
 
 			ident = data;
 
+			if (!('token' in ident)) {
+				ident.authenticated = false;
+			} else {
+				ident.authenticated = self.auth.validate(ident.userId, ident.token);
+			}
+
 			var group = ident.group = self.groupOf(ident.userId, ident.username);
 
 			// Apply ranks.
@@ -49,7 +63,7 @@ ISMShoutServer.prototype.start = function() {
 		});
 
 		socket.on('message', function(msg, fn) {
-			if (!ident) {
+			if (!ident || !ident.authenticated) {
 				fn({ success : false, message : 'Error. No identification received.' });
 				return;
 			}

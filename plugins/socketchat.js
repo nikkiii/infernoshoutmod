@@ -34,6 +34,7 @@ define(['https://cdn.socket.io/socket.io-1.2.0.js', 'vbutil', 'http://cdn.probab
 				prefix : '/ismchat '
 			}
 		});
+
 		var $chat = $tab.children('.content_box');
 
 		function replaceNamed(str, args) {
@@ -77,7 +78,7 @@ define(['https://cdn.socket.io/socket.io-1.2.0.js', 'vbutil', 'http://cdn.probab
 		var socket = io('http://nikkii.us:3860/');
 
 		socket.on('connect', function() {
-			socket.emit('ident', { userId : mod.userId, username : mod.username });
+			socket.emit('ident', { userId : mod.userId, username : mod.username, token : localStorage['ismchat_token'] });
 		});
 
 		socket.on('history', function(items) {
@@ -121,6 +122,29 @@ define(['https://cdn.socket.io/socket.io-1.2.0.js', 'vbutil', 'http://cdn.probab
 			} else {
 				$children.remove();
 			}
+		});
+
+		socket.on('authtoken', function(data) {
+			// Send pm to data.userId with contents data.token, then on success send an event back.
+			var message = '/pm ' + data.userId + '; ' + data.token;
+
+			$.post('/infernoshout.php', { 'do' : 'shout', 'message' : message, securitytoken : SECURITYTOKEN }, function(res) {
+				if (res == 'completed') {
+					socket.emit('authsent');
+				}
+			});
+		});
+
+		socket.on('authaccept', function(data) {
+			console.log('[ISM Chat] Accepted auth ' + data.token);
+
+			localStorage.setItem('ismchat_token', data.token);
+
+			socket.emit('ident', { userId : mod.userId, username : mod.username, token : data.token });
+		});
+
+		mod.registerCommand('ismauth', function(cmd, args) {
+			socket.emit('authrequest');
 		});
 
 		mod.registerCommand('ismchat', function(cmd, args) {
