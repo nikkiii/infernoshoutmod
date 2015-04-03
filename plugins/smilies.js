@@ -27,6 +27,10 @@ define(function() {
 		':weebly:' : {
 			image : 'http://i.imgur.com/LOOLsoS.png',
 			alt : 'weebly'
+		},
+		'\\(:' : {
+			image : 'http://i.imgur.com/tBOeOtT.gif',
+			alt : '(:'
 		}
 	};
 

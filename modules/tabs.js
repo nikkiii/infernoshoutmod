@@ -4,22 +4,29 @@ define(['./mod'], function(InfernoShoutMod) {
 		this.tabs || (this.tabs = {})
 		closeable || (closeable = false);
 
-		InfernoShoutbox.append_tab('<a id="InfernoShoutMod-Tab-' + id + '" href="?" onclick="return InfernoShoutbox.show(\'' + id + '\');">' + title + '</a>');
+		InfernoShoutbox.append_tab('<a id="InfernoShoutMod-Tab-' + id + '" href="?" onclick="return InfernoShoutbox.show(\'' + id + '\');">' + title + '</a>', closeable);
 		this.tabs[id] = { title: title, content: content };
 	};
 
-	InfernoShoutMod.prototype.addStaticTab = function(id, title, content) {
+	InfernoShoutMod.prototype.addStaticTab = function(id, title, content, cfg) {
 		this.staticTabs || (this.staticTabs = {})
 
-		InfernoShoutbox.append_tab('<a id="InfernoShoutMod-Tab-' + id + '" href="?" onclick="return InfernoShoutbox.show(\'' + id + '\');">' + title + '</a>');
+		var config = $.extend({
+			title: title,
+			closeable : false
+		}, cfg);
+
+		InfernoShoutbox.append_tab('<a id="InfernoShoutMod-Tab-' + id + '" href="?" onclick="return InfernoShoutbox.show(\'' + id + '\');">' + title + '</a>', config.closeable);
 
 		var $new = $('#shoutbox_content_frame').clone();
 		$new.attr('id', 'infernoshoutmod_tab_content_' + id);
-		$new.html('<div id="content_box">' + content + '</div>');
+		$new.html('<div class="content_box">' + content + '</div>');
 		$new.hide();
 		$new.appendTo($('#shoutbox_window'));
 
-		this.staticTabs[id] = { title: title };
+		this.staticTabs[id] = config;
+
+		return $new;
 	};
 
 	InfernoShoutMod.prototype.removeTab = function(id) {
@@ -59,7 +66,12 @@ define(['./mod'], function(InfernoShoutMod) {
 					.html("<div id=\'content_box\'>" + mod.tabs[what].content + "</div>")
 					.css('display', 'block');
 			} else if (mod.staticTabs && what in mod.staticTabs) {
+				var config = mod.staticTabs[what];
 				$('#shoutbox_window > span').hide();
+
+				if ('shout_params' in config) {
+					InfernoShoutbox.set_shout_params('shoutbox_frame', config.shout_params.prefix, config.shout_params.suffix, config.shout_params.fetchtype);
+				}
 
 				$('#infernoshoutmod_tab_content_' + what).css('display', 'block');
 			}

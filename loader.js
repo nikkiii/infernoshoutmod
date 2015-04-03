@@ -12,7 +12,8 @@ require.config({
 		soupselect : 'lib/soupselect',
 		idb : 'lib/idb',
 		vbutil : 'lib/vbutil',
-		util : 'lib/util'
+		util : 'lib/util',
+		datejs : 'https://cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min'
 	},
 	shim : {
 		noty : {
@@ -58,6 +59,7 @@ require(['jquery', 'css!fontawesome'], function($) {
 			'plugins/textformatting',
 			'plugins/spotify',
 			'plugins/urban',
+			'plugins/socketchat',
 			'plugins/customloader' // Load custom plugins last
 		], function() {
 			var i;

@@ -1,0 +1,19 @@
+{
+  "name": "infernoshoutmod-server",
+  "version": "1.0.0",
+  "description": "Websocket server for InfernoShoutMod",
+  "main": "index.js",
+  "dependencies": {
+    "autolinker": "^0.17.1",
+    "express": "^4.11.2",
+    "socket.io": "^1.3.4",
+    "glob": "^5.0.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC"
+}

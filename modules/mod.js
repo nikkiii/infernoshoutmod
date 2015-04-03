@@ -126,8 +126,14 @@ define(['minivents'], function(Events) {
 				return false;
 			}
 
-			if (message.length > 1 && (message.indexOf('!') == 0 || message.indexOf('/') == 0)) {
-				if (self.handleCommand(message.substring(1))) {
+			var temp = message;
+
+			if (this.shout_params.prefix[0] == '/') {
+				temp = this.shout_params.prefix + temp;
+			}
+
+			if (temp.length > 1 && (temp.indexOf('!') == 0 || temp.indexOf('/') == 0)) {
+				if (self.handleCommand(temp.substring(1))) {
 					this.clear();
 					return false;
 				}

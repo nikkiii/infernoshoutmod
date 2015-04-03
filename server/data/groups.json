@@ -1,0 +1,6 @@
+{
+  "administrators": {
+	"users": [ 76696 ],
+	"format": "<span style=\"color: #00BFFF;\"><strong><em>{username}</em></strong></span>"
+  }
+}

@@ -16,6 +16,7 @@
 		soupselect : 'lib/soupselect',
 		idb : 'lib/idb',
 		vbutil : 'lib/vbutil',
+		datejs : 'empty:',
 
 		text : './text',
 		css : './css'
