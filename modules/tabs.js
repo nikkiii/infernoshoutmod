@@ -30,13 +30,17 @@ define(['./mod'], function(InfernoShoutMod) {
 	};
 
 	InfernoShoutMod.prototype.removeTab = function(id) {
-		if (this.staticTabs[id]) {
+		if (this.staticTabs && id in this.staticTabs) {
 			$('#infernoshoutmod_tab_content_' + id).remove();
 			delete this.staticTabs[id];
-		} else if (this.tabs[id]) {
+		} else if (this.tabs && id in this.tabs) {
 			delete this.tabs[id];
 		}
-		InfernoShoutbox.close_tab($('#InfernoShoutMod-Tab-' + id).get());
+
+		var $titleElement = $('#InfernoShoutMod-Tab-' + id);
+		if ($titleElement && $titleElement.length) {
+			InfernoShoutbox.close_tab($titleElement.get(0));
+		}
 	};
 
 	var TabModuleInit = function(mod) {

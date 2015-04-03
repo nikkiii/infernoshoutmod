@@ -48,7 +48,7 @@ ISMShoutServer.prototype.start = function() {
 
 			data.userId = parseInt(data.userId);
 
-			ident = data;
+			socket.ident = ident = data;
 
 			if (!('token' in ident)) {
 				ident.authenticated = false;
@@ -56,10 +56,14 @@ ISMShoutServer.prototype.start = function() {
 				ident.authenticated = self.auth.validate(ident.userId, ident.token);
 			}
 
-			var group = ident.group = self.groupOf(ident.userId, ident.username);
+			if (ident.authenticated) {
+				var group = ident.group = self.groupOf(ident.userId, ident.username);
 
-			// Apply ranks.
-			self.applyRanks(ident, group);
+				// Apply ranks.
+				self.applyRanks(ident, group);
+
+				self.refreshClientList();
+			}
 		});
 
 		socket.on('message', function(msg, fn) {
@@ -75,11 +79,27 @@ ISMShoutServer.prototype.start = function() {
 
 			self.pushMessage(ident, msg, fn);
 		});
+
+		socket.on('disconnect', function() {
+			self.refreshClientList();
+		});
 	});
 
 	http.listen(3860, function(){
 		console.log('listening on *:3860');
 	});
+};
+
+ISMShoutServer.prototype.refreshClientList = function() {
+	var users = [];
+	for (var i in this.io.sockets.connected) {
+		var s = this.io.sockets.connected[i];
+
+		if (s.ident && s.ident.authenticated) {
+			users.push({ userId : s.ident.userId, username : s.ident.username });
+		}
+	}
+	this.io.emit('status', { users : users });
 };
 
 ISMShoutServer.prototype.pushMessage = function(ident, msg, fn) {

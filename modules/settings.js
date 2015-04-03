@@ -89,6 +89,11 @@ define(['./mod', 'idb', 'text!./settings/settings.html', './settings/frontend'],
 				$elem.change(function() {
 					ParseSetting(id, setting, $(this));
 				});
+
+				// Force a trigger if we don't have a value.
+				if (!res) {
+					$elem.trigger('change');
+				}
 			});
 		};
 

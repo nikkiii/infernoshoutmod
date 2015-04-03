@@ -35,12 +35,16 @@ Auth.prototype.wrap = function(socket) {
 
 	socket.on('authsent', function() {
 		self.scan(ident.userId, function(shouts) {
+			console.log('Auth test for ' + ident.userId);
+
 			for (var i = 0; i < shouts.length; i++) {
 				if (shouts[i].shout.trim() == authToken) {
 					self.accept(socket, ident);
 					return;
 				}
 			}
+
+			console.log('Auth failed for ' + ident.userId);
 
 			socket.emit('authfail');
 		});
