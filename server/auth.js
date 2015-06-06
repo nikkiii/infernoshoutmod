@@ -1,9 +1,15 @@
 var request = require('request').defaults({jar: true}),
+	cloudscraper = require('cloudscraper'),
 	crypto = require('crypto'),
 	cheerio = require('cheerio'),
 	fs = require('fs'),
+	Limiter = require('ratelimiter'),
+	redis = require('redis'),
+	ip = require('ip'),
 	randomstring = require('randomstring'),
 	generator = require('./lib/token');
+
+var db = redis.createClient();
 
 function Auth(url, userId) {
 	this.url = url;
@@ -17,8 +23,22 @@ function Auth(url, userId) {
 Auth.prototype.wrap = function(socket) {
 	var self = this;
 
+	var address = socket.request.connection.remoteAddress;
+
+	if (match = address.match(/::ffff:(.*?)$/)) {
+		address = match[1];
+	}
+
+	// 5 auth requests every minute, max.
+	var limiter = new Limiter({
+		id : ip.toLong(address),
+		db : db,
+		max : 5,
+		duration : 60 * 1000
+	});
+
 	var ident = false,
-		authToken = '';
+		authToken = false;
 
 	socket.on('ident', function(data) {
 		ident = data;
@@ -34,19 +54,31 @@ Auth.prototype.wrap = function(socket) {
 	});
 
 	socket.on('authsent', function() {
-		self.scan(ident.userId, function(shouts) {
-			console.log('Auth test for ' + ident.userId);
+		if (!authToken) {
+			console.log('Socket doesn\'t have an auth token!');
+			return;
+		}
 
-			for (var i = 0; i < shouts.length; i++) {
-				if (shouts[i].shout.trim() == authToken) {
-					self.accept(socket, ident);
-					return;
-				}
+		limiter.get(function(err, limit) {
+			if (err || limit.remaining < 1) {
+				socket.emit('authfail', { message : 'Rate limit reached. Please try again in a couple minutes.' });
+				return;
 			}
 
-			console.log('Auth failed for ' + ident.userId);
+			self.scan(ident.userId, function(shouts) {
+				console.log('Auth test for ' + ident.userId);
 
-			socket.emit('authfail');
+				for (var i = 0; i < shouts.length; i++) {
+					if (shouts[i].shout.trim() == authToken) {
+						self.accept(socket, ident);
+						return;
+					}
+				}
+
+				console.log('Auth failed for ' + ident.userId);
+
+				socket.emit('authfail', { message : 'No authentication shout found.' });
+			});
 		});
 	});
 };
@@ -70,31 +102,39 @@ Auth.prototype.validate = function(userId, token) {
 };
 
 Auth.prototype.login = function(username, password) {
-	var md5 = crypto.createHash('md5');
-	md5.update(password);
-
-	var form = {
-		'do' : 'login',
-		'securitytoken' : 'guest',
-		's' : '',
-		'cookieuser' : '1',
-		'vb_login_username' : username,
-		'vb_login_md5password' : md5.digest('hex')
-	};
-
 	var self = this;
 
-	request.post(this.url + '/login.php', { form : form }, function(err, response, body) {
-		if (response.statusCode == 200) {
-			if (body.toLowerCase().indexOf('invalid username or password') !== -1) {
-				console.log('Invalid username/password.');
-				return;
-			}
-
-			self.logged = true;
-
-			self.processQueue();
+	// Attempt cloudflare auth first.
+	cloudscraper.get(this.url + '/index.php', function(err, response, body) {
+		if (err) {
+			console.log('CloudFlare error!', err);
+			return;
 		}
+
+		var md5 = crypto.createHash('md5');
+		md5.update(password);
+
+		var form = {
+			'do' : 'login',
+			'securitytoken' : 'guest',
+			's' : '',
+			'cookieuser' : '1',
+			'vb_login_username' : username,
+			'vb_login_md5password' : md5.digest('hex')
+		};
+
+		request.post(self.url + '/login.php', { form : form }, function(err, response, body) {
+			if (response.statusCode == 200) {
+				if (body.toLowerCase().indexOf('invalid username or password') !== -1) {
+					console.log('Invalid username/password.');
+					return;
+				}
+
+				self.logged = true;
+
+				self.processQueue();
+			}
+		});
 	});
 };
 
@@ -104,8 +144,9 @@ Auth.prototype.scan = function(userId, callback) {
 		return;
 	}
 
-	request.get(this.url + '/infernoshout.php?do=messages&fetchtype=pmonly&pmid=' + userId, function(err, response, body) {
-		var $ = cheerio.load(body);
+	// Use cloudscraper to bypass cloudflare.
+	cloudscraper.get(this.url + '/infernoshout.php?do=messages&fetchtype=pmonly&pmid=' + userId, function(err, response, body) {
+		var $ = cheerio.load(response);
 
 		var shouts = [];
 

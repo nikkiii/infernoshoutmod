@@ -16,7 +16,10 @@ define(['https://cdn.socket.io/socket.io-1.2.0.js', 'vbutil', 'http://cdn.probab
 		return pre + ' ' + date.toString("hh:mm tt")
 	}
 	var WebSocketPlugin = function(mod) {
-		var enabled = false, flash = true, socket = false;
+		var enabled = false,
+			flash = true,
+			socket = false,
+			currentUsers = [];
 
 		var $tab, $chat;
 
@@ -65,7 +68,9 @@ define(['https://cdn.socket.io/socket.io-1.2.0.js', 'vbutil', 'http://cdn.probab
 		}
 
 		function initChat() {
-			socket = io('http://nikkii.us:3860/');
+			socket = io('http://nikkii.us:3860/', {
+				'transports' : [ 'websocket' ]
+			});
 
 			socket.on('connect', function() {
 				socket.emit('ident', { userId : mod.userId, username : mod.username, token : localStorage['ismchat_token'] });
@@ -131,9 +136,16 @@ define(['https://cdn.socket.io/socket.io-1.2.0.js', 'vbutil', 'http://cdn.probab
 				localStorage.setItem('ismchat_token', data.token);
 
 				socket.emit('ident', { userId : mod.userId, username : mod.username, token : data.token });
+
+				InfernoShoutbox.show_notice('Authentication accepted.');
+			});
+
+			socket.on('authfail', function(data) {
+				InfernoShoutbox.show_notice('Authentication failed: ' + data.message);
 			});
 
 			socket.on('status', function(data) {
+				currentUsers = data.users;
 				if (data.users) {
 					$('#InfernoShoutMod-Tab-ismchat').text('ISM Chat (' + data.users.length + ')');
 				}
@@ -187,6 +199,14 @@ define(['https://cdn.socket.io/socket.io-1.2.0.js', 'vbutil', 'http://cdn.probab
 
 		mod.registerCommand('ismchat', function(cmd, args) {
 			if (!socket) {
+				return;
+			}
+			// ISM Chat commands
+			if (args[0] == '/users') {
+				var users = currentUsers.map(function(user) {
+					return user.username;
+				});
+				InfernoShoutbox.show_notice('Users: ' + users.join(', '));
 				return;
 			}
 			socket.emit('message', {

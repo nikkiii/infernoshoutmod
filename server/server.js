@@ -56,6 +56,8 @@ ISMShoutServer.prototype.start = function() {
 				ident.authenticated = self.auth.validate(ident.userId, ident.token);
 			}
 
+			delete ident['token'];
+
 			if (ident.authenticated) {
 				var group = ident.group = self.groupOf(ident.userId, ident.username);
 
@@ -91,12 +93,14 @@ ISMShoutServer.prototype.start = function() {
 };
 
 ISMShoutServer.prototype.refreshClientList = function() {
-	var users = [];
+	var users = [], userIds = [];
 	for (var i in this.io.sockets.connected) {
-		var s = this.io.sockets.connected[i];
+		var s = this.io.sockets.connected[i],
+			ident = s.ident;
 
-		if (s.ident && s.ident.authenticated) {
-			users.push({ userId : s.ident.userId, username : s.ident.username });
+		if (ident && ident.authenticated && userIds.indexOf(ident.userId) == -1) {
+			users.push({ userId : ident.userId, username : ident.username });
+			userIds.push(ident.userId);
 		}
 	}
 	this.io.emit('status', { users : users });
@@ -137,8 +141,8 @@ ISMShoutServer.prototype.pushMessage = function(ident, msg, fn) {
 };
 
 ISMShoutServer.prototype.parseMessage = function(message) {
-	if (message.length > 250) {
-		message = message.substring(0, 250);
+	if (message.length > 1024) {
+		message = message.substring(0, 1024);
 	}
 
 	message = bbcode.parse(message);
@@ -147,13 +151,7 @@ ISMShoutServer.prototype.parseMessage = function(message) {
 		stripPrefix : false,
 		email : false,
 		phone : false,
-		twitter : false,
-		replaceFn : function(autolinker, match) {
-			switch (match.getType()) {
-				case 'url':
-					return '[url]' + match.getAnchorHref() + '[/url]';
-			}
-		}
+		twitter : false
 	});
 	
 	return message;

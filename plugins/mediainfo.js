@@ -1,4 +1,8 @@
 define(['../lib/util'], function(Util) {
+	function parseDuration(duration) {
+
+	}
+
 	function YoutubeHandler(url, callback) {
 		var video = '';
 
@@ -45,18 +49,14 @@ define(['../lib/util'], function(Util) {
 		}
 
 		$.ajax({
-			url: '//gdata.youtube.com/feeds/api/videos',
-			data: {
-				q: video,
-				alt: 'json'
-			},
+			url: 'http://api.meow.tf/youtube/info/' + video,
 			dataType: 'jsonp',
 			success: function(result) {
-				if (result['feed'] && result['feed']['entry'] && result['feed']['entry'].length > 0) {
-					var length = parseInt(result['feed']['entry'][0]['media$group']['media$content'][0]['duration']);
-					var title = result['feed']['entry'][0]['title']['$t'];
+				if ('snippet' in result) {
+					var length = Util.parseISO8601Duration(result.contentDetails.duration).toString();
+					var title = result.snippet.title;
 
-					callback(Util.filterTitle(title) + ' [' + Util.secondsToHMS(length) + (startTime ? ', start: ' + startTime : '') + ']');
+					callback(Util.filterTitle(title) + ' [' + length + (startTime ? ', start: ' + startTime : '') + ']');
 				} else {
 					callback(false);
 				}

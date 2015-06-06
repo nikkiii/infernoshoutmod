@@ -60,6 +60,7 @@ require(['jquery', 'css!fontawesome'], function($) {
 			'plugins/spotify',
 			'plugins/urban',
 			'plugins/socketchat',
+			'plugins/autocomplete',
 			'plugins/customloader' // Load custom plugins last
 		], function() {
 			var i;
