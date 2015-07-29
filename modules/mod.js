@@ -154,7 +154,16 @@ define(['minivents'], function(Events) {
 				self.userId = parseInt(match[1]);
 			}
 
-			self.username = $(".welcomelink a").text();
+			var $welcomeLink = $('.welcomelink a'),
+				match = $('body').text().match(/-->\n\n(\d+) - (\d+) - (.*)/);
+
+			if ($welcomeLink.length > 0) {
+				self.username = $welcomeLink.text();
+			} else if (match) {
+				self.username = match[3];
+			} else {
+				// User is likely logged out.
+			}
 		}
 	};
 
