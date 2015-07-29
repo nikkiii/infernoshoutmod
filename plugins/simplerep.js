@@ -76,8 +76,6 @@ define(['htmlparser', 'soupselect', 'vbutil', 'noty'], function(HtmlParser, Soup
 											}
 										}
 
-										i += 1; // Actual number.
-
 										// FIXME: 15 is unique to the forum I visit frequently.
 										noty({ text : 'Unable to ' + (neg ? 'deduct reputation from' : 'add reputation to') + ' ' + name + ', you will be able to after spreading reputation to ' + (15 - i) + ' people.', type : 'error', timeout : 5000 });
 									});
