@@ -66,7 +66,24 @@ define(['htmlparser', 'soupselect', 'vbutil', 'noty'], function(HtmlParser, Soup
 							if (!err) {
 								noty({ text : 'Successfully ' + (neg ? 'deducted reputation from' : 'added reputation to') + ' ' + name + '.', type : 'success', timeout : 5000 });
 							} else {
-								noty({ text : 'Unable to ' + (neg ? 'deduct reputation from' : 'add reputation to') + ' ' + name + ', reason: ' + err, type : 'error', timeout : 5000 });
+								if (err.indexOf('You must spread') !== -1) {
+									// See how long until we can give them reputation again.
+									vbutil.reputationGivenHistory(function(history) {
+										var i = 0;
+										for (; i < history.length; i++) {
+											if (history[i].userId == userId) {
+												break;
+											}
+										}
+
+										i += 1; // Actual number.
+
+										// FIXME: 15 is unique to the forum I visit frequently.
+										noty({ text : 'Unable to ' + (neg ? 'deduct reputation from' : 'add reputation to') + ' ' + name + ', you will be able to after spreading reputation to ' + (15 - i) + ' people.', type : 'error', timeout : 5000 });
+									});
+								} else {
+									noty({ text : 'Unable to ' + (neg ? 'deduct reputation from' : 'add reputation to') + ' ' + name + ', reason: ' + err, type : 'error', timeout : 5000 });
+								}
 							}
 						});
 					});
