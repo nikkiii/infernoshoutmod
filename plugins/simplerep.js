@@ -1,26 +1,18 @@
-define(['htmlparser', 'soupselect', 'vbutil', 'noty'], function(HtmlParser, SoupSelect, vbutil) {
+define(['htmlparser', 'soupselect', 'vbutil', 'config', 'noty'], function(HtmlParser, SoupSelect, vbutil, config) {
 	var SimpleRepPlugin = function(mod) {
 		function findPosts(userid, callback) {
 			$.get('search.php?do=finduser&userid=' + userid + '&contenttype=vBForum_Post&showposts=1', function(data) {
-				new HtmlParser.Parser(new HtmlParser.HtmlBuilder(function(err, dom) {
-					if (err) {
-						console.log(err);
-					} else {
-						var rows = SoupSelect.select(dom, '[id^=post_message_]');
+				var re = /div id="post_message_(\d+)"/g;
 
-						var i, posts = [];
+				var match;
 
-						for (i = 0; i < rows.length; i++) {
-							var row = rows[i];
+				var posts = [];
 
-							if ('id' in row.attributes) {
-								posts.push(parseInt(row.attributes.id.substring(row.attributes.id.lastIndexOf('_')+1)));
-							}
-						}
+				while (match = re.exec(data)) {
+					posts.push(parseInt(match[1]));
+				}
 
-						callback(posts);
-					}
-				})).parseComplete(data);
+				callback(posts);
 			});
 		}
 
@@ -77,7 +69,7 @@ define(['htmlparser', 'soupselect', 'vbutil', 'noty'], function(HtmlParser, Soup
 										}
 
 										// FIXME: 15 is unique to the forum I visit frequently.
-										noty({ text : 'Unable to ' + (neg ? 'deduct reputation from' : 'add reputation to') + ' ' + name + ', you will be able to after spreading reputation to ' + (15 - i) + ' people.', type : 'error', timeout : 5000 });
+										noty({ text : 'Unable to ' + (neg ? 'deduct reputation from' : 'add reputation to') + ' ' + name + ', you will be able to after spreading reputation to ' + (config.reputation.limit - i) + ' people.', type : 'error', timeout : 5000 });
 									});
 								} else {
 									noty({ text : 'Unable to ' + (neg ? 'deduct reputation from' : 'add reputation to') + ' ' + name + ', reason: ' + err, type : 'error', timeout : 5000 });
